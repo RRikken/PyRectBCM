@@ -1,6 +1,9 @@
 =========
 PyRectBCM
 =========
+
+.. image:: https://travis-ci.org/Kreef/PyRectBCM.svg?branch=master
+    :target: https://travis-ci.org/Kreef/PyRectBCM
 .. image:: https://coveralls.io/repos/github/Kreef/PyRectBCM/badge.svg?branch=master
 :target: https://coveralls.io/github/Kreef/PyRectBCM?branch=master
 
