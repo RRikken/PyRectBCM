@@ -1,0 +1,22 @@
+pyrectbcm\.input\_locations package
+===================================
+
+Submodules
+----------
+
+pyrectbcm\.input\_locations\.testkees module
+--------------------------------------------
+
+.. automodule:: pyrectbcm.input_locations.testkees
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: pyrectbcm.input_locations
+    :members:
+    :undoc-members:
+    :show-inheritance:

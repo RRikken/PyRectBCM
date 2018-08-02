@@ -1,0 +1,61 @@
+pyrectbcm package
+=================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    pyrectbcm.input_locations
+
+Submodules
+----------
+
+pyrectbcm\.rectangular\_basin\_amplitude\_plot module
+-----------------------------------------------------
+
+.. automodule:: pyrectbcm.rectangular_basin_amplitude_plot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyrectbcm\.rectangular\_input\_generator module
+-----------------------------------------------
+
+.. automodule:: pyrectbcm.rectangular_input_generator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyrectbcm\.rectangular\_model module
+------------------------------------
+
+.. automodule:: pyrectbcm.rectangular_model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyrectbcm\.rectangular\_run module
+----------------------------------
+
+.. automodule:: pyrectbcm.rectangular_run
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyrectbcm\.skeleton module
+--------------------------
+
+.. automodule:: pyrectbcm.skeleton
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: pyrectbcm
+    :members:
+    :undoc-members:
+    :show-inheritance:
