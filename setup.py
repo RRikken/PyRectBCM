@@ -12,11 +12,16 @@ import sys
 from setuptools import setup
 
 # Add here console scripts and other entry points in ini-style format
-entry_points = """
+entry_points = {
+    'console_scipts': [
+        'pyrectbcm = pyrectbcm.rectangular_run'
+    ]
+}
+"""
 [console_scripts]
-# script_name = pyrectbcm.module:function
+script_name = pyrectbcm.rectangular_run
 # For example:
-# fibonacci = pyrectbcm.skeleton:run
+
 """
 
 
