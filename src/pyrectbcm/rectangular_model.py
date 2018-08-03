@@ -13,15 +13,17 @@ def r_iteration(Input, l2, phij):
     until it matches that found in the hydrodynamic solution (given a certain tolerance).
 
     Args:
-        Input (Class): Class containing all data for the various geograpical elements
-        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos \phi(m, n, j)
-        phij (np.ndarray): 3d-array containing the integrated eigenfunctions over all j inlets
+        Input (Class): Class containing all data for the various geograpical elements.
+            Consists of the Basin, OpenInlets, Ocean, and Pars classes.
+        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos \phi(m, n, j).
+        phij (np.ndarray): 3d-array containing the integrated eigenfunctions over all j inlets.
 
     Returns:
-        uj (np.ndarray): flow velocity in the inlets
-        ub (float): flow velocity in the basin
-        mui2 (np.ndarray): frictional correction factor for the inlets
-        mub2 (complex): frictional correction factor
+        returnObject (dict):
+            uj (np.ndarray): flow velocity in the inlets.
+            ub (float): flow velocity in the basin.
+            mui2 (np.ndarray): frictional correction factor for the inlets.
+            mub2 (complex): frictional correction factor.
     """
     Basin = Input.Basin
     Inlets = Input.OpenInlets
@@ -53,7 +55,7 @@ def r_iteration(Input, l2, phij):
             *(1 + 2j/np.pi*(3/2 - eg - np.log(Ocean.ko*Inlets.widths/2))))
     A2[np.eye(Inlets.numinlets) == 1] = A2self
 
-    A3cn = (Ocean.tidefreq/(g*1j)
+    A3c = (Ocean.tidefreq/(g*1j)
             * np.reshape(
                     (Inlets.widths[np.newaxis, np.newaxis, :, :]*Inlets.depths[np.newaxis, np.newaxis, :, :]
                     * (phij[:, :, :, np.newaxis]*phij[:, :, np.newaxis, :])
@@ -78,16 +80,17 @@ def r_iteration(Input, l2, phij):
         mui2 = 1 - 1j*rj/(Ocean.tidefreq*Inlets.depths)
 
         A1 = A1c*mui2
-        A3 = mub2*ne.evaluate('sum(A3cn/(kmn2 - mub2*kb2), axis=0)')
-        # A3 = mub2*np.sum(A3cn/(kmn2 - mub2*kb2), axis = 0)
+        A3 = mub2*ne.evaluate('sum(A3c/(kmn2 - mub2*kb2), axis=0)')
+        # A3 = mub2*np.sum(A3c/(kmn2 - mub2*kb2), axis = 0)
 
         A = A1 + A2 - A3
         B = np.squeeze(-Ocean.tideamp*np.exp(1j*Ocean.wavenumber*Inlets.locations))
-        # sol = np.zeros(Inlets.numinlets, dtype=complex)
         sol = np.linalg.solve(A, B)
-        ubn = (np.sqrt(1/(Basin.width*Basin.length) * np.sum(Pars.kmn2
-               * np.abs(np.sum(ubc*sol[np.newaxis, np.newaxis, :], axis = 2)
-                               /(Pars.kmn2 - mub2*Basin.kb**2))**2)))
+        ubn = (np.sqrt(1/(Basin.width*Basin.length) * np.sum(
+                Pars.kmn2 * np.abs(
+                    np.sum(ubc*sol[np.newaxis, np.newaxis, :], axis = 2)
+                               /(Pars.kmn2 - mub2*Basin.kb**2)
+                                  )**2)))
         ires = np.abs(np.squeeze(uj) - abs(sol))
         bres = np.abs(ub - ubn)
         res = np.max(np.r_[ires, bres])
@@ -98,6 +101,21 @@ def r_iteration(Input, l2, phij):
     return uj, ub, mui2, mub2
 
 def rec_model(Input, silent = None):
+    """ Runs the barrier coast model.
+    Based on input geometry and parameters,
+    computes the barrier coast evolution
+    over a given time-period.
+
+    Args:
+        Input (Input class): Class containing the input data as generated
+            by the input_generator.
+        silent (boolean): Flag for output per timestep
+
+    Returns:
+        Output (Input class): Class containing the updated inputed classes,
+            containing the computed evolution of the barrier coast.
+    """
+
     Output = copy.deepcopy(Input)
     Basin = Output.Basin
     Inlets = Output.Inlets

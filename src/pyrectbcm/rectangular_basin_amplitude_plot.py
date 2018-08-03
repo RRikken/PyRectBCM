@@ -5,6 +5,14 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
 def amplitude_plot(Input):
+    """ Produces a plot of the tidal amplitude in the basin
+
+    Args:
+        Input (Input class): class containing the model output
+
+        
+    """
+
     Basin = Input.Basin
     Inlets = Input.Inlets
     Ocean = Input.Ocean
