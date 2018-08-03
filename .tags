@@ -710,7 +710,6 @@ add_pid_and_tid	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\debug.py	/^d
 add_run_info	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\data.py	/^    def add_run_info(self, **kwargs):$/;"	m	class:CoverageData
 add_section	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\templite.py	/^    def add_section(self):$/;"	m	class:CodeBuilder
 add_to_hash	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\data.py	/^    def add_to_hash(self, filename, hasher):$/;"	m	class:CoverageData
-amplitude_plot	.\build\lib\pyrectbcm\__main__.py	/^from pyrectbcm.plots import amplitude_plot$/;"	i
 amplitude_plot	.\build\lib\pyrectbcm\multirun.py	/^from pyrectbcm.rectangular_basin_amplitude_plot import amplitude_plot$/;"	i
 amplitude_plot	.\build\lib\pyrectbcm\plots.py	/^def amplitude_plot(Input, silent = None):$/;"	f
 amplitude_plot	.\build\lib\pyrectbcm\rectangular_basin_amplitude_plot.py	/^def amplitude_plot(Input, silent = None):$/;"	f
@@ -1067,7 +1066,6 @@ error	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\debug.py	/^    import 
 error	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\debug.py	/^    import aspectlib.debug                      # pylint: disable=import-error$/;"	i
 escape	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\html.py	/^def escape(t):$/;"	f
 eventlet	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\collector.py	/^                import eventlet.greenthread     # pylint: disable=import-error,useless-suppression$/;"	i
-evolution_plot	.\build\lib\pyrectbcm\__main__.py	/^from pyrectbcm.plots import evolution_plot$/;"	i
 evolution_plot	.\build\lib\pyrectbcm\plots.py	/^def evolution_plot(Input, silent = None):$/;"	f
 evolution_plot	.\build\lib\pyrectbcm\rectangular_inlet_evolution_plot.py	/^def evolution_plot(Input, silent = None):$/;"	f
 evolution_plot	.\build\lib\pyrectbcm\rectangular_input_generator.py	/^        from pyrectbcm.plots import evolution_plot$/;"	i
