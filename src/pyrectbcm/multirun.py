@@ -1,4 +1,4 @@
-from pyrectbcm.rectangular_input_generator import rig
+from pyrectbcm.rectangular_input_generator import ModelData
 from pyrectbcm.rectangular_model import rec_model
 from pyrectbcm.rectangular_basin_amplitude_plot import amplitude_plot
 from multiprocessing import Pool
@@ -7,7 +7,7 @@ Inputs = []
 Outputs = []
 
 def run_model():
-    Input = rig('testkees')
+    Input = ModelData('testkees')
     Output = rec_model(Input, silent = 1)
     return Input, Output
 

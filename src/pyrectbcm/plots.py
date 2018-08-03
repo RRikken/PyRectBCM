@@ -3,14 +3,16 @@ from math import ceil
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+g = 9.81
 
-def amplitude_plot(Input):
+def amplitude_plot(Input, silent = None):
     """ Produces a plot of the tidal amplitude in the basin
 
     Args:
         Input (Input class): class containing the model output
 
-        
+    Returns:
+        True on succes
     """
 
     Basin = Input.Basin
@@ -56,8 +58,45 @@ def amplitude_plot(Input):
         eta = eta + Inlets.widths[:, j]*Inlets.depths[:, j]*Inlets.uj[:, j]*gsum
 
     eta = eta*Ocean.tidefreq/(Basin.depth*g*1j)*Basin.mub
+    if silent == None:
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        ax.plot_surface(X, Y, np.abs(eta), cmap=cm.viridis)
+        ax.view_init(elev = 90, azim = -90)
+        ax.set_aspect('equal')
+        plt.show()
+    return True
 
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    ax.plot_surface(X, Y, np.abs(eta), cmap=cm.viridis)
-    plt.show()
+
+def evolution_plot(Input, silent = None):
+    """ Produces a plot of the evolution of the tidal inlets
+
+    Args:
+        Input (Input class): class containing the model output
+
+    Returns:
+        True on succes
+    """
+    Inlets = Input.Inlets
+    Basin = Input.Basin
+
+    iw = Inlets.wit
+    iw2 = np.zeros((iw.shape[0], Basin.numinlets*4 + 2))
+    iw2[:, 2:-2:4] = iw
+    iw2[:, 3:-2:4] = iw
+
+    x = np.zeros(iw2.shape)
+    x[:, -1] = Basin.width
+    x[:, 1:-1:4] = Inlets.locations - 0.5*iw
+    x[:, 2:-1:4] = Inlets.locations - 0.5*iw
+    x[:, 3:-1:4] = Inlets.locations + 0.5*iw
+    x[:, 4:-1:4] = Inlets.locations + 0.5*iw
+    y = np.arange(0, iw.shape[0])
+    y = np.repeat(y[:, np.newaxis], iw2.shape[1], axis = 1)
+    if silent == None:
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        ax.plot_surface(x/1e3, y/1e3, iw2, cmap=cm.gray_r)
+        ax.view_init(elev = 90, azim = 0)
+        plt.show()
+    return True

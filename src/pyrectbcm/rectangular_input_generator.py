@@ -48,7 +48,7 @@ class Pars:
         self.dt = data.timestep
         self.tend = data.end
 
-class rig:
+class ModelData:
     def __init__ (self, location):
         if location == 'testkees':
             from pyrectbcm.input_locations import testkees
@@ -57,3 +57,11 @@ class rig:
         self.Ocean = Ocean(data)
         self.Inlets = Inlets(data, self.Basin, self.Ocean)
         self.Pars = Pars(self.Basin, data)
+
+    def amplitude_plot(self, silent = None):
+        from pyrectbcm.plots import amplitude_plot
+        return amplitude_plot(self, silent)
+
+    def evolution_plot(self, silent = None):
+        from pyrectbcm.plots import evolution_plot
+        return evolution_plot(self, silent)
