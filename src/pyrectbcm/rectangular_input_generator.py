@@ -1,6 +1,5 @@
 import numpy as np
-def g():
-    return 9.81
+g = 9.81
 
 class Basin:
     def __init__ (self, data):
@@ -8,7 +7,7 @@ class Basin:
         self.length = data.basinlength
         self.width = data.basinwidth
         self.numinlets = data.numinlets
-        self.kb = data.tidefreq/np.sqrt(g()*data.basindepth)
+        self.kb = data.tidefreq/np.sqrt(g*data.basindepth)
         self.cd = 2.5e-3
         self.ub = 0
 
@@ -26,7 +25,7 @@ class Inlets:
         self.depths = self.widths*self.shape
         self.lengths = np.full(basin.numinlets, data.inletlength)
         self.cd = basin.cd
-        self.uj = ocean.tideamp*np.sqrt(g()/self.depths)
+        self.uj = ocean.tideamp*np.sqrt(g/self.depths)
         self.wit = np.zeros((1, basin.numinlets))
 
 class Ocean:
@@ -35,7 +34,7 @@ class Ocean:
         self.wavenumber = data.wavenumber
         self.tideamp = data.tideamp
         self.tidefreq = data.tidefreq
-        self.ko = data.tidefreq/np.sqrt(g()*self.depth)
+        self.ko = data.tidefreq/np.sqrt(g*self.depth)
 
 class Pars:
     def __init__(self, basin, data):

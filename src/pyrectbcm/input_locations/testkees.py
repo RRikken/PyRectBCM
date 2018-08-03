@@ -16,4 +16,4 @@ numinlets = 10
 ueq = 1
 sedimport = 1e+5
 timestep = 0.5
-end = 500
+end = 100

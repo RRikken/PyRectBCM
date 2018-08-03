@@ -1,0 +1,7 @@
+pyrectbcm
+=========
+
+.. toctree::
+   :maxdepth: 4
+
+   pyrectbcm

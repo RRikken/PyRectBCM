@@ -1,12 +1,8 @@
 import time
-import numexpr as ne
-import numpy as np
 from pyrectbcm.rectangular_input_generator import rig
 from pyrectbcm.rectangular_model import rec_model
 from pyrectbcm.rectangular_basin_amplitude_plot import amplitude_plot
-# from rectangular_input_generator import rig
-# from rectangular_model import rec_model
-# from rectangular_basin_amplitude_plot import amplitude_plot
+
 
 def main():
     start_time = time.time()
