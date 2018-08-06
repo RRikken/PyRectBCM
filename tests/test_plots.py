@@ -1,9 +1,10 @@
+import matplotlib
+matplotlib.use('Agg')
 from pyrectbcm.rectangular_input_generator import ModelData
 import py.test
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
+
 
 def test_amp_plot():
     Input = ModelData('testkees')
