@@ -60,8 +60,15 @@ class ModelData:
 
     def amplitude_plot(self, silent = None):
         from pyrectbcm.plots import amplitude_plot
-        return amplitude_plot(self, silent)
+        return amplitude_plot(self, silent = silent)
 
     def evolution_plot(self, silent = None):
         from pyrectbcm.plots import evolution_plot
-        return evolution_plot(self, silent)
+        rv, ax =  evolution_plot(self, silent = silent)
+        if silent == None:
+            ax.view_init(elev = 90, azim = 0)
+        return rv, ax
+
+    def evolution_plot_3p(self, orientation, silent = None):
+        from pyrectbcm.plots import evolution_plot_3p
+        return evolution_plot_3p(self, orientation, silent = silent)

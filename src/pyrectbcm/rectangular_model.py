@@ -7,7 +7,7 @@ from sympy import EulerGamma
 g = 9.81
 eg = np.float64(EulerGamma.evalf(16))
 
-def r_iteration(Input, l2, phij):
+def hydrodynamic_model(Input, l2, phij):
     """ Iterates the friction coefficient and yields flow velocities.
     Computes the flow solution in the inlets and basin, and iterates the velocity scale
     until it matches that found in the hydrodynamic solution (given a certain tolerance).
@@ -42,15 +42,15 @@ def r_iteration(Input, l2, phij):
     betap = (beta+1)/2 * (1 - np.eye(np.sum(Inlets.numinlets)))
     betam = (beta-1)/2
     alpha = abs(np.transpose(Inlets.locations) - Inlets.locations)/a_width[:, np.newaxis]
-    alpha[alpha == 0] = 1e-7
+    alpha[alpha == 0] = 1e-7 # Ensure that alpha**2 != 0
     A2 = ((Inlets.depths*Ocean.tidefreq*a_width[:, np.newaxis])
-                                        / (2*g*Ocean.depth)
-                                        * (beta + 2j/np.pi*((3/2 - eg)*beta
-                                        + betam**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betam**2))
-                                        - betap**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betap**2))
-                                        + alpha*(betam*np.log((alpha+betam)/(alpha-betam)) - betap*np.log((alpha+betap)/(alpha-betap)))
-                                        + alpha**2*np.log(np.sqrt((alpha**2-betam**2)/(alpha**2-betap**2)))
-                                        )))
+            / (2*g*Ocean.depth)
+            * (beta + 2j/np.pi*((3/2 - eg)*beta
+            + betam**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betam**2))
+            - betap**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betap**2))
+            + alpha*(betam*np.log((alpha+betam)/(alpha-betam)) - betap*np.log((alpha+betap)/(alpha-betap)))
+            + alpha**2*np.log(np.sqrt((alpha**2-betam**2)/(alpha**2-betap**2)))
+            )))
     A2self = np.squeeze((Inlets.depths*Ocean.tidefreq*Inlets.widths)/(2*g*Ocean.depth)
             *(1 + 2j/np.pi*(3/2 - eg - np.log(Ocean.ko*Inlets.widths/2))))
     A2[np.eye(Inlets.numinlets) == 1] = A2self
@@ -107,12 +107,12 @@ def rec_model(Input, silent = None):
     over a given time-period.
 
     Args:
-        Input (Input class): Class containing the input data as generated
+        Input (ModelData class): Class containing the input data as generated
             by the input_generator.
         silent (boolean): Flag for output per timestep
 
     Returns:
-        Output (Input class): Class containing the updated inputed classes,
+        Output (ModelData class): Class containing the updated ModelData classes,
             containing the computed evolution of the barrier coast.
     """
 
@@ -122,6 +122,8 @@ def rec_model(Input, silent = None):
     Ocean = Output.Ocean
     Pars = Output.Pars
     Output.OpenInlets = copy.copy(Inlets)
+    OpenInlets = Output.OpenInlets
+
     t = Pars.tstart
     ndt = ceil((Pars.tend-Pars.tstart)/Pars.dt)
     Inlets.wit = np.repeat(Inlets.wit, ndt, axis = 0)
@@ -146,15 +148,16 @@ def rec_model(Input, silent = None):
                 - Inlets.widths[np.newaxis, :, inlets_zip]/2)) ))
         phij = phij * signs[0:Pars.mtrunc+1, 0:Pars.ntrunc+1, 0:(Basin.numinlets)]
 
-        Output.OpenInlets.widths = Inlets.widths[:, inlets_zip]
-        Output.OpenInlets.depths = Inlets.depths[:, inlets_zip]
-        Output.OpenInlets.lengths = Inlets.lengths[inlets_zip]
-        Output.OpenInlets.locations = Inlets.locations[:, inlets_zip]
-        Output.OpenInlets.uj = Inlets.uj[:, inlets_zip]
-        Output.OpenInlets.cd - Inlets.cd
-        Output.OpenInlets.numinlets = np.sum(inlets_zip)
+        OpenInlets.widths = (Inlets.widths[:, inlets_zip])
+        OpenInlets.depths = (Inlets.depths[:, inlets_zip])
+        OpenInlets.lengths = (Inlets.lengths[inlets_zip])
+        OpenInlets.locations = (Inlets.locations[:, inlets_zip])
+        OpenInlets.uj = (Inlets.uj[:, inlets_zip])
+        OpenInlets.cd = (Inlets.cd)
+        OpenInlets.numinlets = np.sum(inlets_zip)
 
-        uj, ub, mui2, mub2 = r_iteration(Output, l2[:, :, inlets_zip], phij[:, :, inlets_zip])
+        # Run hydrodynamic model
+        uj, ub, mui2, mub2 = hydrodynamic_model(Output, l2[:, :, inlets_zip], phij[:, :, inlets_zip])
 
         Inlets.uj[:, inlets_zip] = uj
         Basin.ub = ub

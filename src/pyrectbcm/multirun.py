@@ -12,7 +12,7 @@ def run_model():
     return Input, Output
 
 def runs(N = 0):
-    if N ==0:
+    if N == 0:
         raise NameError("Can't do zero runs")
 
     pool = Pool(processes=4)
