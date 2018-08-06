@@ -1402,6 +1402,7 @@ matplotlib	.\build\lib\pyrectbcm\plots.py	/^import matplotlib.pyplot as plt$/;"	
 matplotlib	.\build\lib\pyrectbcm\rectangular_basin_amplitude_plot.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	.\build\lib\pyrectbcm\rectangular_inlet_evolution_plot.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	.\src\pyrectbcm\plots.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	.\tests\test_plots.py	/^import matplotlib$/;"	i
 matplotlib	.\tests\test_plots.py	/^import matplotlib.pyplot as plt$/;"	i
 measured_files	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\data.py	/^    def measured_files(self):$/;"	m	class:CoverageData
 message_prefix	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\plugin_support.py	/^    def message_prefix(self):$/;"	m	class:LabelledDebug
