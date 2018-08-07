@@ -2789,6 +2789,7 @@ match	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\files.py	/^    def mat
 match	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\files.py	/^    def match(self, fpath):$/;"	m	class:FnmatchMatcher
 match	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\files.py	/^    def match(self, fpath):$/;"	m	class:TreeMatcher
 match	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\files.py	/^    def match(self, module_name):$/;"	m	class:ModuleMatcher
+mathjax_config	.\docs\conf.py	/^mathjax_config = {$/;"	v
 matplotlib	.\build\lib\pyrectbcm\plots.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	.\build\lib\pyrectbcm\rectangular_basin_amplitude_plot.py	/^import matplotlib.pyplot as plt$/;"	i
 matplotlib	.\build\lib\pyrectbcm\rectangular_inlet_evolution_plot.py	/^import matplotlib.pyplot as plt$/;"	i
