@@ -76,14 +76,14 @@ napoleon_google_docstring = True
 templates_path = ['_templates']
 
 # Mathjax path
-# mathjax_path = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
-# mathjax_config = {
-#     'extensions': ['tex2jax.js', 'AMSmath.js', 'AMSsymbols.js'],
-#     'jax': ['input/tex', 'output/HTML-CSS'],
-#     'TeX': {
-#         'extensions: ["AMSmath.js", "AMSsymbols.js"]'
-#     },
-# }
+mathjax_path = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax_config = {
+    'extensions': ['tex2jax.js', 'AMSmath.js', 'AMSsymbols.js'],
+    'jax': ['input/tex', 'output/HTML-CSS'],
+    'TeX': {
+        'extensions: ["AMSmath.js", "AMSsymbols.js"]'
+    },
+}
 # The suffix of source filenames.
 source_suffix = '.rst'
 
