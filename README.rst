@@ -15,8 +15,7 @@ Simulates the evolution of barrier coasts.
 Description
 ===========
 
-A longer description of your project goes here...
-
+Simulates the evolution of barrier coasts.
 
 Note
 ====
