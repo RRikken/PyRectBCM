@@ -96,8 +96,8 @@ def amplitude_plot(Input, ax=None, silent=None):
         eta = eta + Inlets.widths[:, j] * Inlets.depths[:, j] * Inlets.uj[:, j] * gsum
 
     eta = eta * Ocean.tidefreq / (Basin.depth * g * 1j) * Basin.mub
-    if silent == None:
-        if ax == None:
+    if silent is None:
+        if ax is None:
             fig = plt.figure()
             ax = Axes3D(fig)
         ax.plot_surface(X, Y, np.abs(eta), cmap=cm.viridis)
@@ -146,16 +146,20 @@ def evolution_plot(Input, ax=None, silent=None):
     y = np.arange(0, iw.shape[0]) * Pars.dt
     y = np.repeat(y[:, np.newaxis], iw2.shape[1], axis=1)
 
-    if silent == None:
-        if ax == None:
+    if silent is None:
+        if ax is None:
             fig = plt.figure()
             ax = Axes3D(fig)
-        ax.plot_surface(x / 1e3, y, iw2 / 1e3, cmap=cm.gray_r)
+        ax.plot_surface(
+            x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0], ccount=iw2.shape[1]
+        )
 
         # ax.view_init(elev = 90, azim = 0)
-        ax.set_xlim([0, Basin.width / 1e3])
+        ax.set_xlim(
+            [-0.3 * Basin.length / 1e3, (Basin.width + 0.3 * Basin.length) / 1e3]
+        )
         ax.set_ylim([0, iw.shape[0] * Pars.dt])
-        ax.set_zlim([0, 1e3])
+        ax.set_zlim([0, 1e4])
         ax.xaxis.set_visible(False)
         ax.zaxis.set_visible(False)
         ax.set_xticks([])
@@ -198,7 +202,7 @@ def geometry_plot(Input, t, ax=None):
         np.array([0, (Basin.length + offset) * 2, 0, (Basin.width + offset * 2)]) / 1e3
     )
     qs = 20
-    if ax == None:
+    if ax is None:
         fig = plt.figure()
         ax = Axes3D(fig)
     ax.set_xlim(dims[2], dims[3])
@@ -297,7 +301,7 @@ def evolution_plot_3p(Input, orientation, silent=None):
             True: on succes
             fig: figure object
     """
-    if silent == None:
+    if silent is None:
         fig = plt.figure()
         Basin = Input.Basin
         if orientation == "h":
@@ -322,19 +326,18 @@ def evolution_plot_3p(Input, orientation, silent=None):
 
         geometry_plot(Input, 0, ax=ax1)
         ax2 = evolution_plot(Input, ax=ax2)[1]
-        ax2.set_xlim(
-            (-0.3 * Basin.length) / 1e3,
-            (Basin.width + 0.3 * Basin.length) / 1e3,
-        )
         ax2.set_aspect(
             (
                 (ax1.get_xlim()[1] - ax1.get_xlim()[0])
                 / (ax1.get_ylim()[1] - ax1.get_ylim()[0])
             )
             ** 2
-            * (ax1.get_ylim()[1] / ax2.get_ylim()[1]),
-            "box",
+            * (ax1.get_ylim()[1] / ax2.get_ylim()[1])
         )
+        # ax2.set_xlim(
+        #     (-0.3 * Basin.length) / 1e3,
+        #     (Basin.width + 0.3 * Basin.length) / 1e3,
+        # )
         geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)
         fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     else:

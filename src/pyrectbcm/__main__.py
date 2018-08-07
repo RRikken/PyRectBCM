@@ -8,11 +8,11 @@ from pyrectbcm.plots import evolution_plot_3p
 def main():
     start_time = time.time()
     Input = ModelData("testkees")
-    Output = rec_model(Input)
+    Output = rec_model(Input, silent = 1)
     print("%s seconds" % (time.time() - start_time))
 
     # Output.amplitude_plot()
-    # Output.evolution_plot()
+    Output.evolution_plot()
     Output.evolution_plot_3p(orientation="h")
     return Output
 

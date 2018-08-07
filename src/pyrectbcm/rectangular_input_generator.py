@@ -75,7 +75,7 @@ class ModelData:
         from pyrectbcm.plots import evolution_plot
 
         rv, ax = evolution_plot(self, silent=silent)
-        if silent == None:
+        if silent is None:
             ax.view_init(elev=90, azim=0)
         return rv, ax
 
