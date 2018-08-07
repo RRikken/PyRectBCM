@@ -12,17 +12,11 @@ def hydrodynamic_model(Input, l2, phij):
     """ Iterates the friction coefficient and yields flow velocities.
     Computes the flow solution in the inlets and basin, and iterates the velocity scale
     until it matches that found in the hydrodynamic solution (given a certain tolerance).
-    Solves the system :math:`\mathbf{A} \mathbf{\hat{u}} = \mathbf{f}`
-    for the flow velocity amplitude :math:`\mathbf{\hat{u}}`. The forcing therm :math:`\mathbf{f}`
-    consists of a tidal forcing, and matrix :math:`\mathbf{A} = \mathbf{A}_1 + \mathbf{A}_2 - \mathbf{A}_3`.
-    The first term is associated with friction in the channel.
-    The second with the sea impedance.
-    The third term is associated with basin impedance.
 
     Args:
         Input (Class): Class containing all data for the various geograpical elements.
             Consists of the Basin, OpenInlets, Ocean, and Pars classes.
-        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos :math:`\phi_{m, n}(x, y)`.
+        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos.
         phij (np.ndarray): 3d-array containing the integrated eigenfunctions over all j inlets.
 
     Returns:
