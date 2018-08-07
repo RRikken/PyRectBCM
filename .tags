@@ -2467,7 +2467,7 @@ html_file	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\html.py	/^    def 
 html_file	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\html.py	/^    def html_file(self, fr, analysis):$/;"	m	class:HtmlReporter
 html_report	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\control.py	/^    def html_report(self, morfs=None, directory=None, ignore_errors=None,$/;"	m	class:Coverage
 html_report	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\control.py	/^    def html_report(self, morfs=None, directory=None, ignore_errors=None,$/;"	m	class:Coverage
-html_static_path	.\docs\conf.py	/^html_static_path = ['_static']$/;"	v
+html_static_path	.\docs\conf.py	/^html_static_path = [] #'_static'$/;"	v
 html_theme	.\docs\conf.py	/^html_theme = "sphinx_rtd_theme"$/;"	v
 html_theme_path	.\docs\conf.py	/^html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]$/;"	v
 htmlhelp_basename	.\docs\conf.py	/^htmlhelp_basename = 'pyrectbcm-doc'$/;"	v
