@@ -65,7 +65,7 @@ except Exception as e:
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
-              'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
+              'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.imgmath',
               'sphinx.ext.napoleon']
 
 # Napoleon Options
@@ -76,14 +76,14 @@ napoleon_google_docstring = True
 templates_path = ['_templates']
 
 # Mathjax path
-# mathjax_path = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
-mathjax_config = {
-    'extensions': ['tex2jax.js', 'AMSmath.js', 'AMSsymbols.js'],
-    'jax': ['input/tex', 'output/HTML-CSS'],
-    # 'TeX': {
-    #     'extensions: ["AMSmath.js", "AMSsymbols.js"]'
-    # },
-}
+# mathjax_path = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+# mathjax_config = {
+#     'extensions': ['tex2jax.js', 'AMSmath.js', 'AMSsymbols.js'],
+#     'jax': ['input/tex', 'output/HTML-CSS'],
+#     'TeX': {
+#         'extensions: ["AMSmath.js", "AMSsymbols.js"]'
+#     },
+# }
 # The suffix of source filenames.
 source_suffix = '.rst'
 
