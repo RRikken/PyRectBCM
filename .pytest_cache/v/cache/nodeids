@@ -1,0 +1,6 @@
+[
+  "tests/test_plots.py::test_amp_plot",
+  "tests/test_plots.py::test_evo_plot",
+  "tests/test_plots.py::test_evo_plot_3p",
+  "tests/test_rig.py::test_import"
+]

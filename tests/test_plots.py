@@ -8,6 +8,15 @@ import matplotlib.pyplot as plt
 
 def test_amp_plot():
     Input = ModelData('testkees')
+    # Decrease resolution
+    Pars = Input.Pars
+    Pars.mtrunc = 5
+    Pars.ntrunc = 5
+    Pars.mrange = np.arange(Pars.mtrunc+1)
+    Pars.nrange = np.arange(Pars.ntrunc+1)
+    Pars.nrange = Pars.nrange[np.newaxis, :]
+    Pars.kmn2 = (Pars.mrange[:, np.newaxis]*np.pi/Input.Basin.length)**2 + (Pars.nrange*np.pi/Input.Basin.width)**2
+
     uj = np.zeros(Input.Basin.numinlets) + 1
     Input.Inlets.uj = uj[np.newaxis, :]
     Input.Basin.mub = 1-1j*(8/(3*np.pi)*Input.Basin.cd*0.4)/(Input.Ocean.tidefreq*Input.Basin.depth)

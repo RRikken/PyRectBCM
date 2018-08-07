@@ -7,15 +7,22 @@ from sympy import EulerGamma
 g = 9.81
 eg = np.float64(EulerGamma.evalf(16))
 
+
 def hydrodynamic_model(Input, l2, phij):
     """ Iterates the friction coefficient and yields flow velocities.
     Computes the flow solution in the inlets and basin, and iterates the velocity scale
     until it matches that found in the hydrodynamic solution (given a certain tolerance).
+    Solves the system :math:`\mathbf{A} \mathbf{\hat{u}} = \mathbf{f}`
+    for the flow velocity amplitude :math:`\mathbf{\hat{u}}`. The forcing therm :math:`\mathbf{f}`
+    consists of a tidal forcing, and matrix :math:`\mathbf{A} = \mathbf{A}_1 + \mathbf{A}_2 - \mathbf{A}_3`.
+    The first term is associated with friction in the channel.
+    The second with the sea impedance.
+    The third term is associated with basin impedance.
 
     Args:
         Input (Class): Class containing all data for the various geograpical elements.
             Consists of the Basin, OpenInlets, Ocean, and Pars classes.
-        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos \phi(m, n, j).
+        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos :math:`\phi_{m, n}(x, y)`.
         phij (np.ndarray): 3d-array containing the integrated eigenfunctions over all j inlets.
 
     Returns:
@@ -25,6 +32,7 @@ def hydrodynamic_model(Input, l2, phij):
             mui2 (np.ndarray): frictional correction factor for the inlets.
             mub2 (complex): frictional correction factor.
     """
+
     Basin = Input.Basin
     Inlets = Input.OpenInlets
     Ocean = Input.Ocean
@@ -35,72 +43,121 @@ def hydrodynamic_model(Input, l2, phij):
     A3 = np.zeros((Inlets.numinlets, Inlets.numinlets), dtype=complex)
     A = np.zeros((Inlets.numinlets, Inlets.numinlets), dtype=complex)
 
-    A1c = 1j*Ocean.tidefreq*Inlets.lengths/g * np.eye(Inlets.numinlets)
+    A1c = 1j * Ocean.tidefreq * Inlets.lengths / g * np.eye(Inlets.numinlets)
 
     a_width = np.squeeze(Inlets.widths)
-    beta = Inlets.widths/a_width[:, np.newaxis]
-    betap = (beta+1)/2 * (1 - np.eye(np.sum(Inlets.numinlets)))
-    betam = (beta-1)/2
-    alpha = abs(np.transpose(Inlets.locations) - Inlets.locations)/a_width[:, np.newaxis]
-    alpha[alpha == 0] = 1e-7 # Ensure that alpha**2 != 0
-    A2 = ((Inlets.depths*Ocean.tidefreq*a_width[:, np.newaxis])
-            / (2*g*Ocean.depth)
-            * (beta + 2j/np.pi*((3/2 - eg)*beta
-            + betam**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betam**2))
-            - betap**2*np.log(Ocean.ko*a_width[:, np.newaxis]/2*np.sqrt(alpha**2-betap**2))
-            + alpha*(betam*np.log((alpha+betam)/(alpha-betam)) - betap*np.log((alpha+betap)/(alpha-betap)))
-            + alpha**2*np.log(np.sqrt((alpha**2-betam**2)/(alpha**2-betap**2)))
-            )))
-    A2self = np.squeeze((Inlets.depths*Ocean.tidefreq*Inlets.widths)/(2*g*Ocean.depth)
-            *(1 + 2j/np.pi*(3/2 - eg - np.log(Ocean.ko*Inlets.widths/2))))
+    beta = Inlets.widths / a_width[:, np.newaxis]
+    betap = (beta + 1) / 2 * (1 - np.eye(np.sum(Inlets.numinlets)))
+    betam = (beta - 1) / 2
+    alpha = (
+        abs(np.transpose(Inlets.locations) - Inlets.locations) / a_width[:, np.newaxis]
+    )
+    alpha[alpha == 0] = 1e-7  # Ensure that alpha**2 != 0
+    A2 = (
+        (Inlets.depths * Ocean.tidefreq * a_width[:, np.newaxis])
+        / (2 * g * Ocean.depth)
+        * (
+            beta
+            + 2j
+            / np.pi
+            * (
+                (3 / 2 - eg) * beta
+                + betam ** 2
+                * np.log(
+                    Ocean.ko
+                    * a_width[:, np.newaxis]
+                    / 2
+                    * np.sqrt(alpha ** 2 - betam ** 2)
+                )
+                - betap ** 2
+                * np.log(
+                    Ocean.ko
+                    * a_width[:, np.newaxis]
+                    / 2
+                    * np.sqrt(alpha ** 2 - betap ** 2)
+                )
+                + alpha
+                * (
+                    betam * np.log((alpha + betam) / (alpha - betam))
+                    - betap * np.log((alpha + betap) / (alpha - betap))
+                )
+                + alpha ** 2
+                * np.log(np.sqrt((alpha ** 2 - betam ** 2) / (alpha ** 2 - betap ** 2)))
+            )
+        )
+    )
+    A2self = np.squeeze(
+        (Inlets.depths * Ocean.tidefreq * Inlets.widths)
+        / (2 * g * Ocean.depth)
+        * (1 + 2j / np.pi * (3 / 2 - eg - np.log(Ocean.ko * Inlets.widths / 2)))
+    )
     A2[np.eye(Inlets.numinlets) == 1] = A2self
 
-    A3c = (Ocean.tidefreq/(g*1j)
-            * np.reshape(
-                    (Inlets.widths[np.newaxis, np.newaxis, :, :]*Inlets.depths[np.newaxis, np.newaxis, :, :]
-                    * (phij[:, :, :, np.newaxis]*phij[:, :, np.newaxis, :])
-                    / (l2[:, :, :, np.newaxis]*Basin.depth)),
-                    (-1, np.sum(Inlets.numinlets), np.sum(Inlets.numinlets))
-                    )
-           )
-    cmnqc = (Inlets.widths[np.newaxis, :, :]*Inlets.depths[np.newaxis, :, :] * (phij[:, :, :])
-            / (Basin.depth))
-    ubc = cmnqc/np.sqrt(l2)
+    A3c = (
+        Ocean.tidefreq
+        / (g * 1j)
+        * np.reshape(
+            (
+                Inlets.widths[np.newaxis, np.newaxis, :, :]
+                * Inlets.depths[np.newaxis, np.newaxis, :, :]
+                * (phij[:, :, :, np.newaxis] * phij[:, :, np.newaxis, :])
+                / (l2[:, :, :, np.newaxis] * Basin.depth)
+            ),
+            (-1, np.sum(Inlets.numinlets), np.sum(Inlets.numinlets)),
+        )
+    )
+    cmnqc = (
+        Inlets.widths[np.newaxis, :, :]
+        * Inlets.depths[np.newaxis, :, :]
+        * (phij[:, :, :])
+        / (Basin.depth)
+    )
+    ubc = cmnqc / np.sqrt(l2)
     kmn2 = np.reshape(Pars.kmn2[:, :, np.newaxis, np.newaxis], (-1, 1, 1))
-    kb2 = Basin.kb**2
+    kb2 = Basin.kb ** 2
 
     uj = Inlets.uj
     ub = Basin.ub
     res = 42
     r = 1
     while res > 1e-10 and r < 50:
-        rb = 8/(3*np.pi)*Basin.cd*ub
-        rj = 8/(3*np.pi)*Inlets.cd*uj
-        mub2 = 1 - 1j*rb/(Ocean.tidefreq*Basin.depth)
-        mui2 = 1 - 1j*rj/(Ocean.tidefreq*Inlets.depths)
+        rb = 8 / (3 * np.pi) * Basin.cd * ub
+        rj = 8 / (3 * np.pi) * Inlets.cd * uj
+        mub2 = 1 - 1j * rb / (Ocean.tidefreq * Basin.depth)
+        mui2 = 1 - 1j * rj / (Ocean.tidefreq * Inlets.depths)
 
-        A1 = A1c*mui2
-        A3 = mub2*ne.evaluate('sum(A3c/(kmn2 - mub2*kb2), axis=0)')
+        A1 = A1c * mui2
+        A3 = mub2 * ne.evaluate("sum(A3c/(kmn2 - mub2*kb2), axis=0)")
         # A3 = mub2*np.sum(A3c/(kmn2 - mub2*kb2), axis = 0)
 
         A = A1 + A2 - A3
-        B = np.squeeze(-Ocean.tideamp*np.exp(1j*Ocean.wavenumber*Inlets.locations))
+        B = np.squeeze(
+            -Ocean.tideamp * np.exp(1j * Ocean.wavenumber * Inlets.locations)
+        )
         sol = np.linalg.solve(A, B)
-        ubn = (np.sqrt(1/(Basin.width*Basin.length) * np.sum(
-                Pars.kmn2 * np.abs(
-                    np.sum(ubc*sol[np.newaxis, np.newaxis, :], axis = 2)
-                               /(Pars.kmn2 - mub2*Basin.kb**2)
-                                  )**2)))
+        ubn = np.sqrt(
+            1
+            / (Basin.width * Basin.length)
+            * np.sum(
+                Pars.kmn2
+                * np.abs(
+                    np.sum(ubc * sol[np.newaxis, np.newaxis, :], axis=2)
+                    / (Pars.kmn2 - mub2 * Basin.kb ** 2)
+                )
+                ** 2
+            )
+        )
         ires = np.abs(np.squeeze(uj) - abs(sol))
         bres = np.abs(ub - ubn)
         res = np.max(np.r_[ires, bres])
-        uj = (abs(abs(sol[np.newaxis, :])) + uj)/2
-        ub = (ub + abs(ubn))/2
+        uj = (abs(abs(sol[np.newaxis, :])) + uj) / 2
+        ub = (ub + abs(ubn)) / 2
         r = r + 1
 
     return uj, ub, mui2, mub2
 
-def rec_model(Input, silent = None):
+
+def rec_model(Input, silent=None):
     """ Runs the barrier coast model.
     Based on input geometry and parameters,
     computes the barrier coast evolution
@@ -125,47 +182,86 @@ def rec_model(Input, silent = None):
     OpenInlets = Output.OpenInlets
 
     t = Pars.tstart
-    ndt = ceil((Pars.tend-Pars.tstart)/Pars.dt)
-    Inlets.wit = np.repeat(Inlets.wit, ndt, axis = 0)
-    l2 = np.full((Pars.mtrunc+1, Pars.ntrunc+1, Basin.numinlets), Basin.length*Basin.width)
-    l2[1:, :, :] = l2[1:, :, :]/2
-    l2[:, 1:, :] = l2[:, 1:, :]/2
+    ndt = ceil((Pars.tend - Pars.tstart) / Pars.dt)
+    Inlets.wit = np.repeat(Inlets.wit, ndt, axis=0)
+    l2 = np.full(
+        (Pars.mtrunc + 1, Pars.ntrunc + 1, Basin.numinlets), Basin.length * Basin.width
+    )
+    l2[1:, :, :] = l2[1:, :, :] / 2
+    l2[:, 1:, :] = l2[:, 1:, :] / 2
     signs = np.array([1, -1])
-    signs = np.tile(signs[:, np.newaxis, np.newaxis], (ceil((Pars.mtrunc+1)/2), Pars.ntrunc+1, Basin.numinlets))
+    signs = np.tile(
+        signs[:, np.newaxis, np.newaxis],
+        (ceil((Pars.mtrunc + 1) / 2), Pars.ntrunc + 1, Basin.numinlets),
+    )
     uj = Inlets.uj
 
-    while t < Pars.tend and max(abs(1-uj[uj!=0])) > 1e-15 and np.sum(Inlets.widths) > 0:
+    while (
+        t < Pars.tend
+        and max(abs(1 - uj[uj != 0])) > 1e-15
+        and np.sum(Inlets.widths) > 0
+    ):
         inlets_zip = np.squeeze(Inlets.widths > 0)
         phij = np.zeros(l2.shape)
         phij[:, 0, inlets_zip] = 1
         phij[:, 1:, inlets_zip] = (
-            Basin.width/(Pars.nrange[:, 1:, np.newaxis]*np.pi*Inlets.widths[np.newaxis, :, inlets_zip])
-            * ( np.sin(Pars.nrange[:, 1:, np.newaxis]*np.pi/Basin.width*(
-                Inlets.locations[np.newaxis, :, inlets_zip]
-                + Inlets.widths[np.newaxis, :, inlets_zip]/2))
-            -np.sin(Pars.nrange[:, 1:, np.newaxis]*np.pi/Basin.width*(
-                Inlets.locations[np.newaxis, :, inlets_zip]
-                - Inlets.widths[np.newaxis, :, inlets_zip]/2)) ))
-        phij = phij * signs[0:Pars.mtrunc+1, 0:Pars.ntrunc+1, 0:(Basin.numinlets)]
+            Basin.width
+            / (
+                Pars.nrange[:, 1:, np.newaxis]
+                * np.pi
+                * Inlets.widths[np.newaxis, :, inlets_zip]
+            )
+            * (
+                np.sin(
+                    Pars.nrange[:, 1:, np.newaxis]
+                    * np.pi
+                    / Basin.width
+                    * (
+                        Inlets.locations[np.newaxis, :, inlets_zip]
+                        + Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                    )
+                )
+                - np.sin(
+                    Pars.nrange[:, 1:, np.newaxis]
+                    * np.pi
+                    / Basin.width
+                    * (
+                        Inlets.locations[np.newaxis, :, inlets_zip]
+                        - Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                    )
+                )
+            )
+        )
+        phij = (
+            phij
+            * signs[0 : Pars.mtrunc + 1, 0 : Pars.ntrunc + 1, 0 : (Basin.numinlets)]
+        )
 
-        OpenInlets.widths = (Inlets.widths[:, inlets_zip])
-        OpenInlets.depths = (Inlets.depths[:, inlets_zip])
-        OpenInlets.lengths = (Inlets.lengths[inlets_zip])
-        OpenInlets.locations = (Inlets.locations[:, inlets_zip])
-        OpenInlets.uj = (Inlets.uj[:, inlets_zip])
-        OpenInlets.cd = (Inlets.cd)
+        OpenInlets.widths = Inlets.widths[:, inlets_zip]
+        OpenInlets.depths = Inlets.depths[:, inlets_zip]
+        OpenInlets.lengths = Inlets.lengths[inlets_zip]
+        OpenInlets.locations = Inlets.locations[:, inlets_zip]
+        OpenInlets.uj = Inlets.uj[:, inlets_zip]
+        OpenInlets.cd = Inlets.cd
         OpenInlets.numinlets = np.sum(inlets_zip)
 
         # Run hydrodynamic model
-        uj, ub, mui2, mub2 = hydrodynamic_model(Output, l2[:, :, inlets_zip], phij[:, :, inlets_zip])
+        uj, ub, mui2, mub2 = hydrodynamic_model(
+            Output, l2[:, :, inlets_zip], phij[:, :, inlets_zip]
+        )
 
         Inlets.uj[:, inlets_zip] = uj
         Basin.ub = ub
 
-        da = Inlets.sedimport/Inlets.lengths * ((Inlets.uj/Inlets.ueq)**3 - 1) * Pars.dt
-        newi = Inlets.widths**2 + da/Inlets.shape
+        da = (
+            Inlets.sedimport
+            / Inlets.lengths
+            * ((Inlets.uj / Inlets.ueq) ** 3 - 1)
+            * Pars.dt
+        )
+        newi = Inlets.widths ** 2 + da / Inlets.shape
         nix = np.squeeze(newi > 0)
-        Inlets.widths[:, nix] = (np.sqrt(newi[:, nix]))
+        Inlets.widths[:, nix] = np.sqrt(newi[:, nix])
         Inlets.widths[:, ~nix] = 0
 
         Inlets.depths = Inlets.shape * Inlets.widths
@@ -175,13 +271,13 @@ def rec_model(Input, silent = None):
             print(Inlets.wit)
             print(Inlets.depths)
             print(Inlets.uj, Basin.ub, mui2, mub2, da)
-            raise NameError ("aiaiai")
+            raise NameError("aiaiai")
 
         if silent is None:
-            print(t, Inlets.uj, da)
+            print(t, Inlets.uj, da, end="\r")
         t = t + Pars.dt
-        tix = round((t-Pars.tstart)/Pars.dt)
-        Inlets.wit[tix-1, :] = Inlets.widths
+        tix = round((t - Pars.tstart) / Pars.dt)
+        Inlets.wit[tix - 1, :] = Inlets.widths
 
     Inlets.mui = mui2
     Basin.mub = mub2

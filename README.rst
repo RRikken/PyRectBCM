@@ -7,7 +7,8 @@ PyRectBCM
     :target: https://travis-ci.org/Kreef/PyRectBCM
 .. image:: https://coveralls.io/repos/github/Kreef/PyRectBCM/badge.svg?branch=master
     :target: https://coveralls.io/github/Kreef/PyRectBCM?branch=master
-
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
 
 Add a short description here!
 
