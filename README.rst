@@ -10,7 +10,7 @@ PyRectBCM
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/ambv/black
 
-Simulates the evolution of barrier coasts
+Simulates the evolution of barrier coasts.
 
 Description
 ===========
