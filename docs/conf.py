@@ -76,7 +76,7 @@ napoleon_google_docstring = True
 templates_path = ['_templates']
 
 # Mathjax path
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js'
+mathjax_path = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
 
 # The suffix of source filenames.
 source_suffix = '.rst'
