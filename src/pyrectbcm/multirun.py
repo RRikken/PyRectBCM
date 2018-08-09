@@ -30,7 +30,7 @@ def runs(N=0):
         print(Output.Inlets.widths)
     pool.close()
     pool.join()
-
+    return True
 
 if __name__ == "__main__":
     runs(4)

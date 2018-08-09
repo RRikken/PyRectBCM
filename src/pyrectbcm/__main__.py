@@ -8,6 +8,7 @@ from pyrectbcm.plots import evolution_plot_3p
 def main():
     start_time = time.time()
     Input = ModelData("testkees")
+    Input.Pars.tend = 20
     Output = rec_model(Input, silent = 1)
     print("%s seconds" % (time.time() - start_time))
 

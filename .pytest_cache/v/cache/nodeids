@@ -1,6 +1,9 @@
 [
   "tests/test_plots.py::test_amp_plot",
   "tests/test_plots.py::test_evo_plot",
+  "tests/test_plots.py::test_geometry_plot",
   "tests/test_plots.py::test_evo_plot_3p",
-  "tests/test_rig.py::test_import"
+  "tests/test_rig.py::test_import",
+  "tests/test_runs.py::test_single_run",
+  "tests/test_runs.py::test_multi_run"
 ]

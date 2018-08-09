@@ -58,8 +58,7 @@ def hydrodynamic_model(Input, l2, phij):
         / (2 * g * Ocean.depth)
         * (
             beta
-            + 2j
-            / np.pi
+            + (2j / np.pi)
             * (
                 (3 / 2 - eg) * beta
                 + betam ** 2
