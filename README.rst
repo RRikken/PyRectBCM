@@ -20,6 +20,13 @@ Description
 
 Simulates the evolution of barrier coasts.
 
+Readme
+======
+
+An extensive readme can be found here_.
+
+.. _here: https://pyrectbcm.readthedocs.io/en/latest/
+
 Note
 ====
 
