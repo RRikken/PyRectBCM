@@ -27,10 +27,13 @@ __pycache__/*
 
 # Unittest and coverage
 htmlcov/*
+.pytest_cache/*
+.coveragec
 .coverage
 .tox
 junit.xml
 coverage.xml
+vim.exe.stackdump
 
 # Build and docs folder/files
 build/*
