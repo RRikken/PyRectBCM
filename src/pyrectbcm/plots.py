@@ -97,9 +97,11 @@ def amplitude_plot(Input, ax=None):
 
     eta = eta * Ocean.tidefreq / (Basin.depth * g * 1j) * Basin.mub
 
+    pf = 0
     if ax is None:
         fig = plt.figure()
         ax = Axes3D(fig)
+        pf = 1
     ax.plot_surface(X, Y, np.abs(eta), cmap=cm.viridis)
     ax.view_init(elev=90, azim=-90)
     ax.set_aspect("equal")
@@ -112,7 +114,8 @@ def amplitude_plot(Input, ax=None):
     ax.plot(
         (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
     )
-    plt.show()
+    if pf:
+        plt.show(block=False)
     return True, ax
 
 
@@ -146,18 +149,18 @@ def evolution_plot(Input, ax=None):
     y = np.arange(0, iw.shape[0]) * Pars.dt
     y = np.repeat(y[:, np.newaxis], iw2.shape[1], axis=1)
 
+    pf = 0
     if ax is None:
         fig = plt.figure()
         ax = Axes3D(fig)
+        pf = 1
 
     ax.plot_surface(
         x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0], ccount=iw2.shape[1]
     )
 
     # ax.view_init(elev = 90, azim = 0)
-    ax.set_xlim(
-        [-0.3 * Basin.length / 1e3, (Basin.width + 0.3 * Basin.length) / 1e3]
-    )
+    ax.set_xlim([-0.3 * Basin.length / 1e3, (Basin.width + 0.3 * Basin.length) / 1e3])
     ax.set_ylim([0, iw.shape[0] * Pars.dt])
     ax.set_zlim([0, 1e4])
     ax.xaxis.set_visible(False)
@@ -178,7 +181,8 @@ def evolution_plot(Input, ax=None):
     )
     ax.grid(False)
     ax.set_ylabel("Time (years)")
-    plt.show()
+    if pf:
+        plt.show(block = False)
     return True, ax
 
 
@@ -202,9 +206,12 @@ def geometry_plot(Input, t, ax=None):
         np.array([0, (Basin.length + offset) * 2, 0, (Basin.width + offset * 2)]) / 1e3
     )
     qs = 20
+
+    pf = 0
     if ax is None:
         fig = plt.figure()
         ax = Axes3D(fig)
+        pf = 1
     ax.set_xlim(dims[2], dims[3])
     ax.set_ylim(dims[0], dims[1])
     ax.set_zlim(0, 1e2)  # large enough to not see stacking effects of different layers
@@ -266,8 +273,8 @@ def geometry_plot(Input, t, ax=None):
             )
             ax.plot(
                 (
-                    xi + Inlets.widths[:, inlet] / 1e3,
-                    xi + Inlets.widths[:, inlet] / 1e3,
+                    xi + Inlets.wit[t, inlet] / 1e3,
+                    xi + Inlets.wit[t, inlet] / 1e3,
                 ),
                 (dims[1] / 2, dims[1] / 2 + Inlets.lengths[inlet] / 1e3),
                 0.2,
@@ -285,7 +292,9 @@ def geometry_plot(Input, t, ax=None):
     ax.set_aspect(((dims[3] - dims[2]) / (dims[1] - dims[0])) ** 2)
     ax.apply_aspect()
     # print(ax.get_aspect())
-    plt.show
+    if pf:
+        plt.show(block = False)
+
     return True, ax
 
 
@@ -342,5 +351,7 @@ def evolution_plot_3p(Input, orientation):
     #     (Basin.width + 0.3 * Basin.length) / 1e3,
     # )
     geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)
+
+    fig.show()
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     return True, fig

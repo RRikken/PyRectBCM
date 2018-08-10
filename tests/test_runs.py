@@ -4,6 +4,7 @@ from pyrectbcm.rectangular_model import rec_model
 from pyrectbcm.rectangular_input_generator import ModelData
 from numpy import nan
 
+
 def test_single_run():
     Input = ModelData("testkees")
     Input, Output = multirun.run_model()
@@ -26,6 +27,7 @@ def test_single_run():
     Input.Inlets.widths = [nan, nan, nan]
     with py.test.raises(NameError):
         Output = rec_model(Input)
+
 
 def test_multi_run():
     with py.test.raises(NameError):

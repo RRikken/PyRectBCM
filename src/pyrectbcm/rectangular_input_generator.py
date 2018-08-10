@@ -62,25 +62,25 @@ class ModelData:
 
             data = testkees
         else:
-            raise NameError('location unknown')
+            raise NameError("location unknown")
         self.Basin = Basin(data)
         self.Ocean = Ocean(data)
         self.Inlets = Inlets(data, self.Basin, self.Ocean)
         self.Pars = Pars(self.Basin, data)
 
-    def amplitude_plot(self, ax = None):
+    def amplitude_plot(self, ax=None):
         from pyrectbcm.plots import amplitude_plot
 
         return amplitude_plot(self, ax)
 
-    def evolution_plot(self, ax = None):
+    def evolution_plot(self, ax=None):
         from pyrectbcm.plots import evolution_plot
 
         rv, ax = evolution_plot(self, ax)
         ax.view_init(elev=90, azim=0)
         return rv, ax
 
-    def geometry_plot(self, ax = None):
+    def geometry_plot(self, ax=None):
         from pyrectbcm.plots import geometry_plot
 
         rv, ax = geometry_plot(self, ax)

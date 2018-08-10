@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use("Agg")
 from pyrectbcm.rectangular_input_generator import ModelData
 import py.test
@@ -28,7 +29,7 @@ def test_amp_plot():
     plt.ion()
     fig = plt.figure()
     ax = Axes3D(fig)
-    assert Input.amplitude_plot(ax = ax)[0]
+    assert Input.amplitude_plot(ax=ax)[0]
     assert Input.amplitude_plot()[0]
     plt.close("all")
 
@@ -39,9 +40,10 @@ def test_evo_plot():
     plt.ion()
     fig = plt.figure()
     ax = Axes3D(fig)
-    assert Input.evolution_plot(ax = ax)[0]
+    assert Input.evolution_plot(ax=ax)[0]
     assert Input.evolution_plot()[0]
     plt.close("all")
+
 
 def test_geometry_plot():
     Input = ModelData("testkees")
@@ -50,10 +52,11 @@ def test_geometry_plot():
     assert Input.geometry_plot(0)[0]
     plt.close("all")
 
+
 def test_evo_plot_3p():
     Input = ModelData("testkees")
     Input.Inlets.wit = np.repeat(Input.Inlets.widths, 3, axis=0)
-    Input.Inlets.wit[:, 2] = Input.Inlets.wit[:, 2]*0
+    Input.Inlets.wit[:, 2] = Input.Inlets.wit[:, 2] * 0
     plt.ion()
     assert Input.evolution_plot_3p(orientation="h")[0]
     assert Input.evolution_plot_3p(orientation="v")[0]
