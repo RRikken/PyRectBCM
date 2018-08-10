@@ -12,10 +12,10 @@ def main(location = None):
         location = "testkees"
     start_time = time.time()
     Input = ModelData(location)
-    Output = rec_model(Input)
+    Output = rec_model(Input, silent = 1)
     print("%s seconds" % (time.time() - start_time))
 
-    Output.amplitude_plot()
+    # Output.amplitude_plot()
     # Output.evolution_plot()
     Output.evolution_plot_3p(orientation="h")
     return Output
