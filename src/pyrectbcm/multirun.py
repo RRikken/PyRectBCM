@@ -9,6 +9,7 @@ Outputs = []
 
 def run_model():
     Input = ModelData("testkees")
+    Input.Pars.tend = 200
     Output = rec_model(Input, silent=1)
     return Input, Output
 

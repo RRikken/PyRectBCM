@@ -273,7 +273,7 @@ def rec_model(Input, silent=None):
             raise NameError("aiaiai")
 
         if silent is None:
-            print(t, Inlets.uj, da, end="\r")
+            print(t, Inlets.uj, da)
         t = t + Pars.dt
         tix = round((t - Pars.tstart) / Pars.dt)
         Inlets.wit[tix - 1, :] = Inlets.widths

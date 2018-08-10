@@ -1,4 +1,6 @@
-%matplotlib
+#%matplotlib
+import matplotlib as mpl
+mpl.use('Agg')
 import time
 from pyrectbcm.rectangular_input_generator import ModelData
 from pyrectbcm.rectangular_model import rec_model
@@ -8,8 +10,8 @@ from pyrectbcm.plots import evolution_plot_3p
 def main():
     start_time = time.time()
     Input = ModelData("testkees")
-    Input.Pars.tend = 20
-    Output = rec_model(Input, silent = 1)
+    Input.Pars.tend = 200
+    Output = rec_model(Input)
     print("%s seconds" % (time.time() - start_time))
 
     # Output.amplitude_plot()
