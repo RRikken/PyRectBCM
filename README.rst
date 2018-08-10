@@ -17,8 +17,14 @@ Simulates the evolution of barrier coasts.
 
 Description
 ===========
-
 Simulates the evolution of barrier coasts.
+
+.. figure:: ./docs/_static/example.png
+    :scale: 90%
+    :alt: example run
+
+    Example run of the model
+
 
 Readme
 ======
