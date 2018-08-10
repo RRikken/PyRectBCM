@@ -1,11 +1,18 @@
 import py.test
 import pyrectbcm.multirun as multirun
+from pyrectbcm.__main__ import main
 from pyrectbcm.rectangular_model import rec_model
 from pyrectbcm.rectangular_input_generator import ModelData
 from numpy import nan
 
 
 def test_single_run():
+    Output = main()
+    assert hasattr(Output, "Basin")
+    assert hasattr(Output, "Inlets")
+    assert hasattr(Output, "Ocean")
+    assert hasattr(Output, "Pars")
+
     Input = ModelData("testkees")
     Input, Output = multirun.run_model()
     assert hasattr(Input, "Basin")
