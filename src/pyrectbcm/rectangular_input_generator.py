@@ -59,11 +59,9 @@ class ModelData:
     def __init__(self, location):
         if location == "testkees":
             from pyrectbcm.input_locations import testkees
-
             data = testkees
         elif location == "testlocation":
             from pyrectbcm.input_locations import testlocation
-
             data = testlocation
         else:
             raise NameError("location unknown")

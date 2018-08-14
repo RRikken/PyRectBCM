@@ -22,4 +22,4 @@ def main(location = None):
 
 
 if __name__ == "__main__":
-    Output = main()
+    Output = main("testlocation")
