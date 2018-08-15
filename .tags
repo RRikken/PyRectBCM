@@ -442,7 +442,7 @@ OriginalProcess	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\multiproc.py
 OriginalProcess	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\multiproc.py	/^    OriginalProcess = multiprocessing.process.BaseProcess$/;"	v
 OriginalProcess	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\multiproc.py	/^    OriginalProcess = multiprocessing.Process$/;"	v
 OriginalProcess	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\multiproc.py	/^    OriginalProcess = multiprocessing.process.BaseProcess$/;"	v
-Output	.\build\lib\pyrectbcm\__main__.py	/^    Output = main("testlocationz")$/;"	v
+Output	.\build\lib\pyrectbcm\__main__.py	/^    Output = main("testkees")$/;"	v
 Output	.\build\lib\pyrectbcm\rectangular_run.py	/^Output = rec_model(Input)$/;"	v
 Output	.\src\pyrectbcm\__main__.py	/^    Output = main("testlocation")$/;"	v
 Outputs	.\build\lib\pyrectbcm\multirun.py	/^Outputs = []$/;"	v
@@ -1711,10 +1711,10 @@ clear_exclude	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\control.py	/^ 
 clear_exclude	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\control.py	/^    def clear_exclude(self, which='exclude'):$/;"	m	class:Coverage
 closeReply	.\build\sphinx\html\_static\websupport.js	/^  function closeReply(id) {$/;"	f
 closeReply	.\docs\_build\html\_static\websupport.js	/^  function closeReply(id) {$/;"	f
-cm	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
+cm	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
 cm	.\build\lib\pyrectbcm\rectangular_basin_amplitude_plot.py	/^from matplotlib import cm$/;"	i
 cm	.\build\lib\pyrectbcm\rectangular_inlet_evolution_plot.py	/^from matplotlib import cm$/;"	i
-cm	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
+cm	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
 cmd_line	.\docs\conf.py	/^    cmd_line = cmd_line_template.format(outputdir=output_dir, moduledir=module_dir)$/;"	v
 cmd_line_template	.\docs\conf.py	/^    cmd_line_template = "sphinx-apidoc -f -o {outputdir} {moduledir}"$/;"	v
 code	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\contrib\setuptools_scm\win_py31_compat.py	/^	def code(self):$/;"	m	class:WindowsError
@@ -2371,8 +2371,8 @@ greenlet	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\collector.py	/^    
 greenlet	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\collector.py	/^                import greenlet$/;"	i
 greenthread	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\collector.py	/^                import eventlet.greenthread     # pylint: disable=import-error,useless-suppression$/;"	i
 greenthread	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\collector.py	/^                import eventlet.greenthread     # pylint: disable=import-error,useless-suppression$/;"	i
-gridspec	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
-gridspec	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
+gridspec	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
+gridspec	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
 guess_next_dev_version	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\contrib\setuptools_scm\version.py	/^def guess_next_dev_version(version):$/;"	f
 guess_next_version	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\contrib\setuptools_scm\version.py	/^def guess_next_version(tag_version, distance):$/;"	f
 handleObj.handler	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\htmlfiles\jquery.hotkeys.js	/^		handleObj.handler = function( event ) {$/;"	f
@@ -2790,9 +2790,9 @@ main	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\__main__.py	/^from cove
 main	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\cmdline.py	/^def main(argv=None):$/;"	f
 main	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\__main__.py	/^from coverage.cmdline import main$/;"	i
 main	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\cmdline.py	/^def main(argv=None):$/;"	f
-main	.\build\lib\pyrectbcm\__main__.py	/^def main(location = None):$/;"	f
+main	.\build\lib\pyrectbcm\__main__.py	/^def main(location=None):$/;"	f
 main	.\build\lib\pyrectbcm\skeleton.py	/^def main(args):$/;"	f
-main	.\src\pyrectbcm\__main__.py	/^def main(location = None):$/;"	f
+main	.\src\pyrectbcm\__main__.py	/^def main(location=None):$/;"	f
 main	.\tests\test_runs.py	/^from pyrectbcm.__main__ import main$/;"	i
 make_code_from_py	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\execfile.py	/^def make_code_from_py(filename):$/;"	f
 make_code_from_py	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\execfile.py	/^def make_code_from_py(filename):$/;"	f
@@ -3141,8 +3141,8 @@ patch_multiprocessing	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\multip
 patch_multiprocessing	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\control.py	/^    from coverage.multiproc import patch_multiprocessing$/;"	i
 patch_multiprocessing	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\control.py	/^    patch_multiprocessing = None$/;"	v
 patch_multiprocessing	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\multiproc.py	/^def patch_multiprocessing(rcfile):$/;"	f
-patches	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
-patches	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches$/;"	i
+patches	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
+patches	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
 path	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\cli.py	/^import os.path$/;"	i
 path	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\templates\__init__.py	/^import os.path$/;"	i
 path	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\cmdline.py	/^import os.path$/;"	i
@@ -3339,6 +3339,8 @@ ratio_covered	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\results.py	/^ 
 ratio_covered	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\results.py	/^    def ratio_covered(self):$/;"	m	class:Numbers
 raw_new_contract	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\misc.py	/^    from contracts import new_contract as raw_new_contract$/;"	i
 raw_new_contract	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\misc.py	/^    from contracts import new_contract as raw_new_contract$/;"	i
+rcParams	.\build\lib\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
+rcParams	.\src\pyrectbcm\plots.py	/^from matplotlib import cm, gridspec, patches, rcParams$/;"	i
 rcfile	.\.eggs\coverage-5.0a1-py3.5-win-amd64.egg\coverage\cmdline.py	/^    rcfile = optparse.make_option($/;"	v	class:Opts
 rcfile	.\.eggs\coverage-5.0a1-py3.6-win-amd64.egg\coverage\cmdline.py	/^    rcfile = optparse.make_option($/;"	v	class:Opts
 re	.\.eggs\PyScaffold-3.0.3-py3.6.egg\pyscaffold\contrib\setuptools_scm\version.py	/^import re$/;"	i

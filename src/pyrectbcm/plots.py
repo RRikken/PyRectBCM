@@ -1,7 +1,7 @@
 import numpy as np
 from math import ceil
 import matplotlib.pyplot as plt
-from matplotlib import cm, gridspec, patches
+from matplotlib import cm, gridspec, patches, rcParams
 from matplotlib.collections import PatchCollection
 from mpl_toolkits.mplot3d import Axes3D, art3d
 
@@ -114,6 +114,7 @@ def amplitude_plot(Input, ax=None):
     ax.plot(
         (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
     )
+
     if pf:
         plt.show(block=False)
     return True, ax
@@ -156,13 +157,10 @@ def evolution_plot(Input, ax=None):
         pf = 1
 
     ax.plot_surface(
-        x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0], ccount=iw2.shape[1]
+        x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0]/2, ccount=iw2.shape[1]
     )
 
-    # ax.view_init(elev = 90, azim = 0)
-    ax.set_xlim([-0.3 * Basin.length / 1e3, (Basin.width + 0.3 * Basin.length) / 1e3])
-    ax.set_ylim([0, iw.shape[0] * Pars.dt])
-    ax.set_zlim([0, 1e4])
+
     ax.xaxis.set_visible(False)
     ax.zaxis.set_visible(False)
     ax.set_xticks([])
@@ -173,16 +171,25 @@ def evolution_plot(Input, ax=None):
     ax.xaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
     ax.yaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
-    xmin, xmax = ax.get_xlim()
-    ymin, ymax = ax.get_ylim()
 
+
+    xmin = -0.3*Basin.length/1e3
+    xmax = (Basin.width + 0.3 * Basin.length) / 1e3
+    ymin = 0
+    ymax = iw.shape[0] * Pars.dt
+    zmin = 0
+    zmax = 1e4
     ax.plot(
         (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
     )
+    ax.set_xlim3d([xmin, xmax])
+    ax.set_ylim3d([ymin, ymax])
+    ax.set_zlim3d([zmin, zmax])
     ax.grid(False)
     ax.set_ylabel("Time (years)")
+
     if pf:
-        plt.show(block = False)
+        plt.show(block=False)
     return True, ax
 
 
@@ -212,9 +219,7 @@ def geometry_plot(Input, t, ax=None):
         fig = plt.figure()
         ax = Axes3D(fig)
         pf = 1
-    ax.set_xlim(dims[2], dims[3])
-    ax.set_ylim(dims[0], dims[1])
-    ax.set_zlim(0, 1e2)  # large enough to not see stacking effects of different layers
+
     cl = np.array([74, 124, 89]) / 256
     cs = np.array([104, 176, 171]) / 256
     cb = cs
@@ -264,7 +269,7 @@ def geometry_plot(Input, t, ax=None):
                 facecolor=cs,
             )
             ax.add_patch(inlet_)
-            art3d.pathpatch_2d_to_3d(inlet_, z=0.2)
+            art3d.pathpatch_2d_to_3d(inlet_, z=0.05)
             ax.plot(
                 (xi, xi),
                 (dims[1] / 2, dims[1] / 2 + Inlets.lengths[inlet] / 1e3),
@@ -272,15 +277,12 @@ def geometry_plot(Input, t, ax=None):
                 color=cc,
             )
             ax.plot(
-                (
-                    xi + Inlets.wit[t, inlet] / 1e3,
-                    xi + Inlets.wit[t, inlet] / 1e3,
-                ),
+                (xi + Inlets.wit[t, inlet] / 1e3, xi + Inlets.wit[t, inlet] / 1e3),
                 (dims[1] / 2, dims[1] / 2 + Inlets.lengths[inlet] / 1e3),
                 0.2,
                 color=cc,
             )
-
+    # Set plot options
     ax.axis("off")
     ax.plot(
         (dims[2], dims[2], dims[3], dims[3], dims[2]),
@@ -291,9 +293,13 @@ def geometry_plot(Input, t, ax=None):
     ax.grid(False)
     ax.set_aspect(((dims[3] - dims[2]) / (dims[1] - dims[0])) ** 2)
     ax.apply_aspect()
-    # print(ax.get_aspect())
+    ax.set_xlim3d(dims[2], dims[3])
+    ax.set_ylim3d(dims[0], dims[1])
+    ax.set_zlim3d(0, 1e2)  # large enough to not see stacking effects of different layers
+
+
     if pf:
-        plt.show(block = False)
+        plt.show(block=False)
 
     return True, ax
 
@@ -317,27 +323,42 @@ def evolution_plot_3p(Input, orientation):
         ax1 = fig.add_subplot(gs[0, 0], projection="3d")
         ax1.view_init(elev=90, azim=0)
         ax1.set_xlabel("along-shore")
-        ax1.set_title("Initial\nconfiguration")
-        ax2 = fig.add_subplot(gs[0, 1:2], projection="3d")
+        ax1.set_title("Initial\nconfiguration", y = 0.875)
+        ax1.set_anchor((0, 0))
+
+
+        ax2 = fig.add_subplot(gs[0, 1], projection="3d")
         ax2.view_init(elev=90, azim=0)
-        ax2.set_title("Evolution")
+        ax2.set_title("Evolution", y = 0.875)
+        ax2.set_anchor((1/3, 0))
+
         ax3 = fig.add_subplot(gs[0, 2], projection="3d")
-        geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)
         ax3.view_init(elev=90, azim=0)
-        ax3.set_title("Equilibrium\n configuration")
+        ax3.set_title("Equilibrium\n configuration", y = 0.875)
+        ax3.set_anchor((2/3, 0))
+
     elif orientation == "v":
         gs = gridspec.GridSpec(3, 1)
+
         ax1 = fig.add_subplot(gs[2, 0], projection="3d")
         ax1.view_init(elev=90, azim=-90)
-        ax2 = fig.add_subplot(gs[1:2, 0], projection="3d")
+        ax1.set_title("Initial\nconfiguration")
+
+        ax2 = fig.add_subplot(gs[1, 0], projection="3d")
         ax2.view_init(elev=90, azim=-90)
+        ax2.set_title("Evolution")
+
         ax3 = fig.add_subplot(gs[0, 0], projection="3d")
         ax3.view_init(elev=90, azim=-90)
+        ax3.set_title("Equilibrium\n configuration")
+
     else:
         raise NameError("No/wrong orientation specified. Choose either 'h' or 'v'.")
 
-    geometry_plot(Input, 0, ax=ax1)
+    ax1 = geometry_plot(Input, 0, ax=ax1)[1]
     ax2 = evolution_plot(Input, ax=ax2)[1]
+    ax3 = geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)[1]
+
     ax2.set_aspect(
         (
             (ax1.get_xlim()[1] - ax1.get_xlim()[0])
@@ -346,12 +367,9 @@ def evolution_plot_3p(Input, orientation):
         ** 2
         * (ax1.get_ylim()[1] / ax2.get_ylim()[1])
     )
-    # ax2.set_xlim(
-    #     (-0.3 * Basin.length) / 1e3,
-    #     (Basin.width + 0.3 * Basin.length) / 1e3,
-    # )
-    geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)
-
+    # gs.tight_layout(fig, pad = 0.5, h_pad = 0, w_pad = 0)
+    # fig.tight_layout()
     fig.show()
-    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    # fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+
     return True, fig
