@@ -18,6 +18,7 @@ __pycache__/*
 .pydevproject
 .settings
 .idea
+.tags
 
 # Package files
 *.egg
