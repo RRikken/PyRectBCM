@@ -94,7 +94,6 @@ def amplitude_plot(Input, ax=None):
                     / ((Pars.kmn2[m, n] - Basin.mub * Basin.kb ** 2) * l2[m, n, j])
                 )
         eta = eta + Inlets.widths[:, j] * Inlets.depths[:, j] * Inlets.uj[:, j] * gsum
-
     eta = eta * Ocean.tidefreq / (Basin.depth * g * 1j) * Basin.mub
 
     pf = 0
@@ -155,11 +154,9 @@ def evolution_plot(Input, ax=None):
         fig = plt.figure()
         ax = Axes3D(fig)
         pf = 1
-
     ax.plot_surface(
-        x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0]/2, ccount=iw2.shape[1]
+        x / 1e3, y, iw2, cmap=cm.gray_r, rcount=iw2.shape[0] / 2, ccount=iw2.shape[1]
     )
-
 
     ax.xaxis.set_visible(False)
     ax.zaxis.set_visible(False)
@@ -172,8 +169,7 @@ def evolution_plot(Input, ax=None):
     ax.yaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 
-
-    xmin = -0.3*Basin.length/1e3
+    xmin = -0.3 * Basin.length / 1e3
     xmax = (Basin.width + 0.3 * Basin.length) / 1e3
     ymin = 0
     ymax = iw.shape[0] * Pars.dt
@@ -212,14 +208,12 @@ def geometry_plot(Input, t, ax=None):
     dims = (
         np.array([0, (Basin.length + offset) * 2, 0, (Basin.width + offset * 2)]) / 1e3
     )
-    qs = 20
 
     pf = 0
     if ax is None:
         fig = plt.figure()
         ax = Axes3D(fig)
         pf = 1
-
     cl = np.array([74, 124, 89]) / 256
     cs = np.array([104, 176, 171]) / 256
     cb = cs
@@ -295,12 +289,12 @@ def geometry_plot(Input, t, ax=None):
     ax.apply_aspect()
     ax.set_xlim3d(dims[2], dims[3])
     ax.set_ylim3d(dims[0], dims[1])
-    ax.set_zlim3d(0, 1e2)  # large enough to not see stacking effects of different layers
-
+    ax.set_zlim3d(
+        0, 1e2
+    )  # large enough to not see stacking effects of different layers
 
     if pf:
         plt.show(block=False)
-
     return True, ax
 
 
@@ -323,20 +317,18 @@ def evolution_plot_3p(Input, orientation):
         ax1 = fig.add_subplot(gs[0, 0], projection="3d")
         ax1.view_init(elev=90, azim=0)
         ax1.set_xlabel("along-shore")
-        ax1.set_title("Initial\nconfiguration", y = 0.875)
+        ax1.set_title("Initial\nconfiguration", y=0.875)
         ax1.set_anchor((0, 0))
-
 
         ax2 = fig.add_subplot(gs[0, 1], projection="3d")
         ax2.view_init(elev=90, azim=0)
-        ax2.set_title("Evolution", y = 0.875)
-        ax2.set_anchor((1/3, 0))
+        ax2.set_title("Evolution", y=0.875)
+        ax2.set_anchor((1 / 3, 0))
 
         ax3 = fig.add_subplot(gs[0, 2], projection="3d")
         ax3.view_init(elev=90, azim=0)
-        ax3.set_title("Equilibrium\n configuration", y = 0.875)
-        ax3.set_anchor((2/3, 0))
-
+        ax3.set_title("Equilibrium\n configuration", y=0.875)
+        ax3.set_anchor((2 / 3, 0))
     elif orientation == "v":
         gs = gridspec.GridSpec(3, 1)
 
@@ -351,10 +343,8 @@ def evolution_plot_3p(Input, orientation):
         ax3 = fig.add_subplot(gs[0, 0], projection="3d")
         ax3.view_init(elev=90, azim=-90)
         ax3.set_title("Equilibrium\n configuration")
-
     else:
         raise NameError("No/wrong orientation specified. Choose either 'h' or 'v'.")
-
     ax1 = geometry_plot(Input, 0, ax=ax1)[1]
     ax2 = evolution_plot(Input, ax=ax2)[1]
     ax3 = geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)[1]
