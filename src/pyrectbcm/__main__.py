@@ -11,7 +11,7 @@ def main(location=None):
         location = "testkees"
     start_time = time.time()
     Input = ModelData(location)
-    Output = rec_model(Input, silent=1)
+    Output = rec_model(Input, silent=0)
     print("%s seconds" % (time.time() - start_time))
     # Output.amplitude_plot()
     # Output.evolution_plot()
@@ -20,4 +20,4 @@ def main(location=None):
 
 
 if __name__ == "__main__":
-    Output = main("testkees")
+    Output = main("testlocation")

@@ -1,8 +1,7 @@
 import numpy as np
 from math import ceil
 import matplotlib.pyplot as plt
-from matplotlib import cm, gridspec, patches, rcParams
-from matplotlib.collections import PatchCollection
+from matplotlib import cm, gridspec, patches
 from mpl_toolkits.mplot3d import Axes3D, art3d
 
 g = 9.81
@@ -257,13 +256,13 @@ def geometry_plot(Input, t, ax=None):
         if Inlets.wit[t, inlet] > 0:
             xi = (Inlets.locations[:, inlet] - Inlets.wit[t, inlet] / 2 + offset) / 1e3
             inlet_ = patches.Rectangle(
-                (xi, dims[1] / 2 - 0.1),
+                (xi, dims[1] / 2 - dims[1]/100),
                 Inlets.wit[t, inlet] / 1e3,
-                Inlets.lengths[inlet] * 1e-3 + 0.1,
+                Inlets.lengths[inlet] * 1e-3 + dims[1]/50,
                 facecolor=cs,
             )
             ax.add_patch(inlet_)
-            art3d.pathpatch_2d_to_3d(inlet_, z=0.05)
+            art3d.pathpatch_2d_to_3d(inlet_, z=0.15)
             ax.plot(
                 (xi, xi),
                 (dims[1] / 2, dims[1] / 2 + Inlets.lengths[inlet] / 1e3),
