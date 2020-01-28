@@ -274,6 +274,8 @@ def rec_model(Input, silent=None):
 
         if silent is None:
             print(t, Inlets.uj, da)
+        else:
+            print(t)
         t = t + Pars.dt
         tix = round((t - Pars.tstart) / Pars.dt)
         Inlets.wit[tix - 1, :] = Inlets.widths

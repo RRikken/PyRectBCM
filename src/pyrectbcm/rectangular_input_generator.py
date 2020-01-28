@@ -15,7 +15,7 @@ class Basin:
 
 
 class Inlets:
-    def __init__(self, data, basin, ocean):
+    def __init__(self, data, basin, ocean, seed=None):
         self.shape = data.inletshape
         self.sedimport = data.sedimport
         self.ueq = data.ueq
@@ -23,6 +23,7 @@ class Inlets:
         self.locations = np.array([coastalpoints[0:-1] + coastalpoints[1] / 2])
         # self.widths = np.repeat(np.array(400, dtype = np.float64), basin.numinlets)
         # self.widths = self.widths[np.newaxis, :]
+        np.random.seed(seed)
         self.widths = (0.2 * np.random.rand(1, basin.numinlets) + 0.9) * data.inletwidth
         self.depths = self.widths * self.shape
         self.lengths = np.full(basin.numinlets, data.inletlength)
@@ -56,7 +57,7 @@ class Pars:
 
 
 class ModelData:
-    def __init__(self, location):
+    def __init__(self, location, seed=None):
         if location == "testkees":
             from pyrectbcm.input_locations import testkees
 
@@ -72,13 +73,18 @@ class ModelData:
 
         self.Basin = Basin(data)
         self.Ocean = Ocean(data)
-        self.Inlets = Inlets(data, self.Basin, self.Ocean)
+        self.Inlets = Inlets(data, self.Basin, self.Ocean, seed)
         self.Pars = Pars(self.Basin, data)
 
-    def amplitude_plot(self, ax=None):
-        from pyrectbcm.plots import amplitude_plot
+    def zeta_amplitude_plot(self, ax=None):
+        from pyrectbcm.plots import zeta_amplitude_plot
 
-        return amplitude_plot(self, ax)
+        return zeta_amplitude_plot(self, ax)
+
+    def u_amplitude_plot(self):
+        from pyrectbcm.plots import u_amplitude_plot
+
+        return u_amplitude_plot(self)
 
     def evolution_plot(self, ax=None):
         from pyrectbcm.plots import evolution_plot

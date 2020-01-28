@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D, art3d
 g = 9.81
 
 
-def amplitude_plot(Input, ax=None):
+def zeta_amplitude_plot(Input, ax=None):
     """ Produces a plot of the tidal amplitude in the basin
 
     Args:
@@ -115,6 +115,305 @@ def amplitude_plot(Input, ax=None):
 
     if pf:
         plt.show(block=False)
+    return True, ax
+
+
+def u_amplitude_plot(Input, ax=None):
+    """ Produces a plot of the tidal amplitude in the basin
+
+    Args:
+        Input (ModelData class): class containing the model output
+        ax (axis): figure axis
+        silent (int): flag for plotting or not plotting
+
+    Returns:
+        returnObject (dict):
+            True: on succes
+            ax: axes object
+    """
+
+    Basin = Input.Basin
+    Inlets = Input.Inlets
+    Ocean = Input.Ocean
+    Pars = Input.Pars
+    # Inlets.uj = Inlets.uj/Inlets.uj
+    # Basin.ub = 1
+    # rb = 8/(3*np.pi)*Basin.cd*Basin.ub
+    # Basin.mub = 1 - 1j*rb/(Ocean.tidefreq*Basin.depth)
+
+    u = 0
+    v = 0
+    g = 9.81
+
+    X = np.linspace(0, Basin.length, num=200)
+    Y = np.linspace(0, Basin.width, num=200)
+    X, Y = np.meshgrid(X, Y)
+    inlets_zip = np.squeeze(Inlets.widths > 0)
+
+    l2 = np.full(
+        (Pars.mtrunc + 1, Pars.ntrunc + 1, Basin.numinlets), Basin.length * Basin.width
+    )
+    l2[1:, :, :] = l2[1:, :, :] / 2
+    l2[:, 1:, :] = l2[:, 1:, :] / 2
+    signs = np.array([1, -1])
+    signs = np.tile(
+        signs[:, np.newaxis, np.newaxis],
+        (ceil((Pars.mtrunc + 1) / 2), Pars.ntrunc + 1, Basin.numinlets),
+    )
+    phij = np.copy(l2) * 0
+    phij[:, 0, :] = 1
+    phij[:, 1:, inlets_zip] = (
+        Basin.width
+        / (
+            Pars.nrange[:, 1:, np.newaxis]
+            * np.pi
+            * Inlets.widths[np.newaxis, :, inlets_zip]
+        )
+        * (
+            np.sin(
+                Pars.nrange[:, 1:, np.newaxis]
+                * np.pi
+                / Basin.width
+                * (
+                    Inlets.locations[np.newaxis, :, inlets_zip]
+                    + Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                )
+            )
+            - np.sin(
+                Pars.nrange[:, 1:, np.newaxis]
+                * np.pi
+                / Basin.width
+                * (
+                    Inlets.locations[np.newaxis, :, inlets_zip]
+                    - Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                )
+            )
+        )
+    )
+    phij = phij * signs[0 : Pars.mtrunc + 1, 0 : Pars.ntrunc + 1, 0 : (Basin.numinlets)]
+
+    for j in range(0, Basin.numinlets):
+        gusum = 0
+        gvsum = 0
+        for m in Pars.mrange:
+            for n in np.squeeze(Pars.nrange):
+                gusum += -1 * (
+                    (
+                        phij[m, n, j]
+                        * (m * np.pi / Basin.length)
+                        * np.sin(m * np.pi * X / Basin.length)
+                        * np.cos(n * np.pi * Y / Basin.width)
+                    )
+                    / ((Pars.kmn2[m, n] - Basin.mub * Basin.kb ** 2) * l2[m, n, j])
+                )
+                gvsum += -1 * (
+                    (
+                        phij[m, n, j]
+                        * np.cos(m * np.pi * X / Basin.length)
+                        * (n * np.pi / Basin.width)
+                        * np.sin(n * np.pi * Y / Basin.width)
+                    )
+                    / ((Pars.kmn2[m, n] - Basin.mub * Basin.kb ** 2) * l2[m, n, j])
+                )
+        u = u + Inlets.widths[:, j] * Inlets.depths[:, j] * Inlets.uj[:, j] * gusum
+        v = v + Inlets.widths[:, j] * Inlets.depths[:, j] * Inlets.uj[:, j] * gvsum
+    u = u * -1
+    v = v * -1
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.plot_surface(X, Y, np.angle(u), cmap=cm.viridis)
+    plt.title("angle u")
+    ax.view_init(elev=90, azim=-90)
+    ax.set_aspect("equal")
+    ax.set_zticks([])
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.plot(
+        (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    )
+    plt.show(block=False)
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.plot_surface(X, Y, np.angle(v), cmap=cm.viridis)
+    plt.title("angle v")
+    ax.view_init(elev=90, azim=-90)
+    ax.set_aspect("equal")
+    ax.set_zticks([])
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.plot(
+        (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    )
+    plt.show(block=False)
+
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(X, Y, np.abs(u), cmap=cm.viridis)
+    # plt.title("abs u")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+    #
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(X, Y, np.abs(v), cmap=cm.viridis)
+    # plt.title("abs v")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(X, Y, np.sqrt(np.abs(u) ** 2 + np.abs(v) ** 2), cmap=cm.viridis)
+    # plt.title("abs uv")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(
+    #     X[:, 1:],
+    #     Y[:, 1:],
+    #     np.angle(v[:, 1:] - v[:, 0:-1] + u[:, 1:] - u[:, 0:-1]),
+    #     cmap=cm.viridis,
+    # )
+    # plt.title("angle dv/dy")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+    #
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(
+    #     X[1:, :],
+    #     Y[1:, :],
+    #     np.angle(v[1:, :] - v[0:-1, :] + u[1:, :] - u[0:-1, :]),
+    #     cmap=cm.viridis,
+    # )
+    # plt.title("angle dv/dx")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+    #
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.plot_surface(
+    #     X[:, 1:],
+    #     Y[:, 1:],
+    #     np.fmod(np.angle(v)[:, 1:] - np.angle(v)[:, 0:-1], 1.9 * np.pi),
+    #     cmap=cm.viridis,
+    # )
+    # plt.title("d angle v/dy")
+    # ax.view_init(elev=90, azim=-90)
+    # ax.set_aspect("equal")
+    # ax.set_zticks([])
+    # ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    # ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    # xmin, xmax = ax.get_xlim()
+    # ymin, ymax = ax.get_ylim()
+    #
+    # ax.plot(
+    #     (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    # )
+    # plt.show(block=False)
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.plot_surface(
+        X[1:, :],
+        Y[1:, :],
+        np.fmod(np.angle(v)[1:, :] - np.angle(v)[0:-1, :], 1.9 * np.pi),
+        cmap=cm.viridis,
+    )
+    plt.title("d angle v/dx")
+    ax.view_init(elev=90, azim=-90)
+    ax.set_aspect("equal")
+    ax.set_zticks([])
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.plot(
+        (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    )
+    plt.show(block=False)
+
+    Z = np.abs(np.fmod(np.angle(v)[1:, :] - np.angle(v)[0:-1, :], 1.9 * np.pi))
+    zix = Z < 0.1
+    Z[zix] = np.nan
+    Z[~zix] = 1
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.plot_surface(X[1:, :], Y[1:, :], Z, cmap=cm.viridis)
+    plt.title("d angle v/dx")
+    ax.view_init(elev=90, azim=-90)
+    ax.set_aspect("equal")
+    ax.set_zticks([])
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.plot(
+        (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
+    )
+    plt.show(block=False)
+
     return True, ax
 
 
@@ -256,9 +555,9 @@ def geometry_plot(Input, t, ax=None):
         if Inlets.wit[t, inlet] > 0:
             xi = (Inlets.locations[:, inlet] - Inlets.wit[t, inlet] / 2 + offset) / 1e3
             inlet_ = patches.Rectangle(
-                (xi, dims[1] / 2 - dims[1]/100),
+                (xi, dims[1] / 2 - dims[1] / 100),
                 Inlets.wit[t, inlet] / 1e3,
-                Inlets.lengths[inlet] * 1e-3 + dims[1]/50,
+                Inlets.lengths[inlet] * 1e-3 + dims[1] / 50,
                 facecolor=cs,
             )
             ax.add_patch(inlet_)
