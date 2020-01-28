@@ -102,7 +102,7 @@ def zeta_amplitude_plot(Input, ax=None):
         pf = 1
     ax.plot_surface(X, Y, np.abs(eta), cmap=cm.viridis)
     ax.view_init(elev=90, azim=-90)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     ax.set_zticks([])
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
@@ -225,7 +225,7 @@ def u_amplitude_plot(Input, ax=None):
     ax.plot_surface(X, Y, np.angle(u), cmap=cm.viridis)
     plt.title("angle u")
     ax.view_init(elev=90, azim=-90)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     ax.set_zticks([])
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
@@ -242,7 +242,7 @@ def u_amplitude_plot(Input, ax=None):
     ax.plot_surface(X, Y, np.angle(v), cmap=cm.viridis)
     plt.title("angle v")
     ax.view_init(elev=90, azim=-90)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     ax.set_zticks([])
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
@@ -381,7 +381,7 @@ def u_amplitude_plot(Input, ax=None):
     )
     plt.title("d angle v/dx")
     ax.view_init(elev=90, azim=-90)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     ax.set_zticks([])
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
@@ -402,7 +402,7 @@ def u_amplitude_plot(Input, ax=None):
     ax.plot_surface(X[1:, :], Y[1:, :], Z, cmap=cm.viridis)
     plt.title("d angle v/dx")
     ax.view_init(elev=90, azim=-90)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     ax.set_zticks([])
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
@@ -583,8 +583,8 @@ def geometry_plot(Input, t, ax=None):
         color="k",
     )
     ax.grid(False)
-    ax.set_aspect(((dims[3] - dims[2]) / (dims[1] - dims[0])) ** 2)
-    ax.apply_aspect()
+    # ax.set_aspect(((dims[3] - dims[2]) / (dims[1] - dims[0])) ** 2)
+    # ax.apply_aspect()
     ax.set_xlim3d(dims[2], dims[3])
     ax.set_ylim3d(dims[0], dims[1])
     ax.set_zlim3d(
@@ -647,14 +647,14 @@ def evolution_plot_3p(Input, orientation):
     ax2 = evolution_plot(Input, ax=ax2)[1]
     ax3 = geometry_plot(Input, Input.Inlets.wit.shape[0] - 1, ax=ax3)[1]
 
-    ax2.set_aspect(
-        (
-            (ax1.get_xlim()[1] - ax1.get_xlim()[0])
-            / (ax1.get_ylim()[1] - ax1.get_ylim()[0])
-        )
-        ** 2
-        * (ax1.get_ylim()[1] / ax2.get_ylim()[1])
-    )
+    # ax2.set_aspect(
+    #     (
+    #         (ax1.get_xlim()[1] - ax1.get_xlim()[0])
+    #         / (ax1.get_ylim()[1] - ax1.get_ylim()[0])
+    #     )
+    #     ** 2
+    #     * (ax1.get_ylim()[1] / ax2.get_ylim()[1])
+    # )
     # gs.tight_layout(fig, pad = 0.5, h_pad = 0, w_pad = 0)
     # fig.tight_layout()
     fig.show()
