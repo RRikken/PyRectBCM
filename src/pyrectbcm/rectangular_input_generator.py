@@ -103,10 +103,10 @@ class ModelData:
 
         return zeta_amplitude_plot(self, ax)
 
-    def u_amplitude_plot(self):
+    def u_amplitude_plot(self, ax=None):
         from pyrectbcm.plots import u_amplitude_plot
 
-        return u_amplitude_plot(self)
+        return u_amplitude_plot(self, ax)
 
     def evolution_plot(self, ax=None):
         from pyrectbcm.plots import evolution_plot

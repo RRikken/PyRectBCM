@@ -219,9 +219,12 @@ def u_amplitude_plot(Input, ax=None):
         v = v + Inlets.widths[:, j] * Inlets.depths[:, j] * Inlets.uj[:, j] * gvsum
     u = u * -1
     v = v * -1
+    pf = 0
+    if ax is None:
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        pf = 1
 
-    fig = plt.figure()
-    ax = Axes3D(fig)
     ax.plot_surface(X, Y, np.angle(u), cmap=cm.viridis)
     plt.title("angle u")
     ax.view_init(elev=90, azim=-90)
@@ -235,7 +238,8 @@ def u_amplitude_plot(Input, ax=None):
     ax.plot(
         (xmin, xmin, xmax, xmax, xmin), (ymin, ymax, ymax, ymin, ymin), 1, color="k"
     )
-    plt.show(block=False)
+    if pf:
+        plt.show(block=False)
 
     fig = plt.figure()
     ax = Axes3D(fig)
