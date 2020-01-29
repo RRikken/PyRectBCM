@@ -29,8 +29,10 @@ def test_amp_plot():
     plt.ion()
     fig = plt.figure()
     ax = Axes3D(fig)
-    assert Input.amplitude_plot(ax=ax)[0]
-    assert Input.amplitude_plot()[0]
+    assert Input.zeta_amplitude_plot(ax=ax)[0]
+    assert Input.zeta_amplitude_plot()[0]
+    assert Input.u_amplitude_plot(ax=ax)[0]
+    assert Input.u_amplitude_plot()[0]
     plt.close("all")
 
 
