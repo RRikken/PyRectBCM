@@ -4,6 +4,10 @@ g = 9.81
 
 
 class Basin:
+    """
+    The Basin object contains the parameters of the backbarrier basin
+    """
+
     def __init__(self, data):
         self.depth = data.basindepth
         self.length = data.basinlength
@@ -15,6 +19,12 @@ class Basin:
 
 
 class Inlets:
+    """
+    The Inlet object contains the parameters and dimensions of the tidal inlets.
+    These dimensions change during a simulation.
+    N.B. the inlet width is randomized slightly.
+    """
+
     def __init__(self, data, basin, ocean, seed=None):
         self.shape = data.inletshape
         self.sedimport = data.sedimport
@@ -33,6 +43,10 @@ class Inlets:
 
 
 class Ocean:
+    """
+    The Ocean object contains the parameters of the outer sea.
+    """
+
     def __init__(self, data):
         self.depth = data.oceandepth
         self.wavenumber = data.wavenumber
@@ -42,6 +56,10 @@ class Ocean:
 
 
 class Pars:
+    """
+    The Pars object contains miscallaneous parameters.
+    """
+
     def __init__(self, basin, data):
         self.mtrunc = 50
         self.ntrunc = 50
@@ -57,6 +75,10 @@ class Pars:
 
 
 class ModelData:
+    """
+    The ModelData object contains the other parameter objects.
+    """
+
     def __init__(self, location, seed=None):
         if location == "testkees":
             from pyrectbcm.input_locations import testkees
