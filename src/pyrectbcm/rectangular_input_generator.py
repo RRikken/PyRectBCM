@@ -1,3 +1,4 @@
+import importlib
 import numpy as np
 
 g = 9.81
@@ -31,8 +32,6 @@ class Inlets:
         self.ueq = data.ueq
         coastalpoints = np.linspace(0, basin.width, basin.numinlets + 1)
         self.locations = np.array([coastalpoints[0:-1] + coastalpoints[1] / 2])
-        # self.widths = np.repeat(np.array(400, dtype = np.float64), basin.numinlets)
-        # self.widths = self.widths[np.newaxis, :]
         np.random.seed(seed)
         self.widths = (0.2 * np.random.rand(1, basin.numinlets) + 0.9) * data.inletwidth
         self.depths = self.widths * self.shape
@@ -80,17 +79,13 @@ class ModelData:
     """
 
     def __init__(self, location, seed=None):
-        if location == "testkees":
-            from pyrectbcm.input_locations import testkees
+        if not isinstance(location, str):
+            raise NameError("enter location as string")
 
-            data = testkees
-
-        elif location == "testlocation":
-            from pyrectbcm.input_locations import testlocation
-
-            data = testlocation
-
-        else:
+        inputlocation = "..input_locations." + location
+        try:
+            data = importlib.import_module(inputlocation, package=__name__)
+        except:
             raise NameError("location unknown")
 
         self.Basin = Basin(data)
