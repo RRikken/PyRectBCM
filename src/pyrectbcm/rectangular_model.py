@@ -3,12 +3,20 @@ from math import ceil
 import numpy as np
 import numexpr as ne
 from sympy import EulerGamma
+from pyrectbcm.data_classes import ModelData, Basin, Inlets, Ocean, Parameters
+from pyrectbcm.constants import GRAVITY
 
-g = 9.81
 eg = np.float64(EulerGamma.evalf(16))
 
 
-def hydrodynamic_model(Input, l2, phij):
+def hydrodynamic_model(
+        basin: Basin,
+        inlets: Inlets,
+        ocean: Ocean,
+        parameters: Parameters,
+        l2: np.ndarray,
+        phij: np.ndarray
+) -> dict:
     """ Iterates the friction coefficient and yields flow velocities.
     Computes the flow solution in the inlets and basin, and iterates the velocity scale
     until it matches that found in the hydrodynamic solution (given a certain tolerance).
@@ -20,9 +28,11 @@ def hydrodynamic_model(Input, l2, phij):
     The third term is associated with basin impedance.
 
     Args:
-        Input (Class): Class containing all data for the various geograpical elements.
-            Consists of the Basin, OpenInlets, Ocean, and Pars classes.
-        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctinos :math:`\phi_{m, n}(x, y)`.
+        basin (Basin)
+        inlets (Inlets)
+        ocean (Ocean)
+        parameters (Pars)
+        l2 (np.ndarray): 3d-array containing the L2-norm for the eigenfunctions :math:`\phi_{m, n}(x, y)`.
         phij (np.ndarray): 3d-array containing the integrated eigenfunctions over all j inlets.
 
     Returns:
@@ -32,12 +42,6 @@ def hydrodynamic_model(Input, l2, phij):
             mui2 (np.ndarray): frictional correction factor for the inlets.
             mub2 (complex): frictional correction factor.
     """
-
-    # Create handles for convenience
-    Basin = Input.Basin
-    Inlets = Input.OpenInlets
-    Ocean = Input.Ocean
-    Pars = Input.Pars
 
     # Initialize main matrix A and three constructor matrices A1, A2, A3 such that A = A1 + A2 - A3
     A1 = np.zeros((Inlets.numinlets, Inlets.numinlets), dtype=complex)
@@ -54,12 +58,12 @@ def hydrodynamic_model(Input, l2, phij):
     betap = (beta + 1) / 2 * (1 - np.eye(np.sum(Inlets.numinlets)))
     betam = (beta - 1) / 2
     alpha = (
-        abs(np.transpose(Inlets.locations) - Inlets.locations) / a_width[:, np.newaxis]
+        abs(np.transpose(inlets.locations) - inlets.locations) / a_width[:, np.newaxis]
     )
     alpha[alpha == 0] = 1e-7  # Ensure that alpha**2 != 0
     A2 = (
-        (Inlets.depths * Ocean.tidefreq * a_width[:, np.newaxis])
-        / (2 * g * Ocean.depth)
+        (inlets.depths * ocean.tidefreq * a_width[:, np.newaxis])
+        / (2 * GRAVITY * ocean.depth)
         * (
             beta
             + (2j / np.pi)
@@ -67,14 +71,14 @@ def hydrodynamic_model(Input, l2, phij):
                 (3 / 2 - eg) * beta
                 + betam ** 2
                 * np.log(
-                    Ocean.ko
+                    ocean.ko
                     * a_width[:, np.newaxis]
                     / 2
                     * np.sqrt(alpha ** 2 - betam ** 2)
                 )
                 - betap ** 2
                 * np.log(
-                    Ocean.ko
+                    ocean.ko
                     * a_width[:, np.newaxis]
                     / 2
                     * np.sqrt(alpha ** 2 - betap ** 2)
@@ -90,48 +94,49 @@ def hydrodynamic_model(Input, l2, phij):
         )
     )
     A2self = np.squeeze(
-        (Inlets.depths * Ocean.tidefreq * Inlets.widths)
-        / (2 * g * Ocean.depth)
-        * (1 + 2j / np.pi * (3 / 2 - eg - np.log(Ocean.ko * Inlets.widths / 2)))
+        (inlets.depths * ocean.tidefreq * inlets.widths)
+        / (2 * GRAVITY * ocean.depth)
+        * (1 + 2j / np.pi * (3 / 2 - eg - np.log(ocean.ko * inlets.widths / 2)))
     )
-    A2[np.eye(Inlets.numinlets) == 1] = A2self
+    A2[np.eye(inlets.numinlets) == 1] = A2self
 
     # Compute the friction independent part of A3
     A3c = (
-        Ocean.tidefreq
-        / (g * 1j)
+        ocean.tidefreq
+        / (GRAVITY * 1j)
         * np.reshape(
             (
-                Inlets.widths[np.newaxis, np.newaxis, :, :]
-                * Inlets.depths[np.newaxis, np.newaxis, :, :]
+                inlets.widths[np.newaxis, np.newaxis, :, :]
+                * inlets.depths[np.newaxis, np.newaxis, :, :]
                 * (phij[:, :, :, np.newaxis] * phij[:, :, np.newaxis, :])
-                / (l2[:, :, :, np.newaxis] * Basin.depth)
+                / (l2[:, :, :, np.newaxis] * basin.depth)
             ),
-            (-1, np.sum(Inlets.numinlets), np.sum(Inlets.numinlets)),
+            (-1, np.sum(inlets.numinlets), np.sum(inlets.numinlets)),
         )
     )
 
     # Prepare for friction iteration
     cmnqc = (
-        Inlets.widths[np.newaxis, :, :]
-        * Inlets.depths[np.newaxis, :, :]
+        inlets.widths[np.newaxis, :, :]
+        * inlets.depths[np.newaxis, :, :]
         * (phij[:, :, :])
-        / (Basin.depth)
+        / (basin.depth)
     )
     ubc = cmnqc / np.sqrt(l2)
-    kmn2 = np.reshape(Pars.kmn2[:, :, np.newaxis, np.newaxis], (-1, 1, 1))
-    kb2 = Basin.kb ** 2
-    uj = Inlets.uj
-    ub = Basin.ub
+    kmn2 = np.reshape(parameters.kmn2[:, :, np.newaxis, np.newaxis], (-1, 1, 1))
+    kb2 = basin.kb ** 2
+
+    uj = inlets.uj
+    ub = basin.ub
     res = 42
     r = 1
 
     # Friction iteration loop
     while res > 1e-10 and r < 50:
-        rb = 8 / (3 * np.pi) * Basin.cd * ub
-        rj = 8 / (3 * np.pi) * Inlets.cd * uj
-        mub2 = 1 - 1j * rb / (Ocean.tidefreq * Basin.depth)
-        mui2 = 1 - 1j * rj / (Ocean.tidefreq * Inlets.depths)
+        rb = 8 / (3 * np.pi) * basin.cd * ub
+        rj = 8 / (3 * np.pi) * inlets.cd * uj
+        mub2 = 1 - 1j * rb / (ocean.tidefreq * basin.depth)
+        mui2 = 1 - 1j * rj / (ocean.tidefreq * inlets.depths)
 
         A1 = A1c * mui2
         A3 = mub2 * ne.evaluate("sum(A3c/(kmn2 - mub2*kb2), axis=0)")
@@ -140,19 +145,19 @@ def hydrodynamic_model(Input, l2, phij):
         # Construct matrix A and solve linear system
         A = A1 + A2 - A3
         B = np.squeeze(
-            -Ocean.tideamp * np.exp(1j * Ocean.wavenumber * Inlets.locations)
+            -ocean.tideamp * np.exp(1j * ocean.wavenumber * inlets.locations)
         )
         sol = np.linalg.solve(A, B)
 
         # Compute velocity scale in the basin
         ubn = np.sqrt(
             1
-            / (Basin.width * Basin.length)
+            / (basin.width * basin.length)
             * np.sum(
-                Pars.kmn2
+                parameters.kmn2
                 * np.abs(
                     np.sum(ubc * sol[np.newaxis, np.newaxis, :], axis=2)
-                    / (Pars.kmn2 - mub2 * Basin.kb ** 2)
+                    / (parameters.kmn2 - mub2 * basin.kb ** 2)
                 )
                 ** 2
             )
@@ -169,140 +174,142 @@ def hydrodynamic_model(Input, l2, phij):
     return uj, ub, mui2, mub2
 
 
-def rec_model(Input, silent=None):
+def rec_model(model_input: ModelData, silent: bool = False) -> ModelData:
     """ Runs the barrier coast model.
     Based on input geometry and parameters,
     computes the barrier coast evolution
     over a given time-period.
 
     Args:
-        Input (ModelData class): Class containing the input data as generated
+        model_input (ModelData class): Class containing the input data as generated
             by the input_generator.
         silent (boolean): Flag for output per timestep
 
     Returns:
-        Output (ModelData class): Class containing the updated ModelData classes,
+        output (ModelData class): Class containing the updated ModelData classes,
             containing the computed evolution of the barrier coast.
     """
 
     # Create handles for convenience
-    Output = copy.deepcopy(Input)
-    Basin = Output.Basin
-    Inlets = Output.Inlets
-    Ocean = Output.Ocean
-    Pars = Output.Pars
-    Output.OpenInlets = copy.copy(Inlets)
-    OpenInlets = Output.OpenInlets
     uj = Inlets.uj
+    output = copy.deepcopy(model_input)
+    basin = output.get_basin()
+    inlets = output.get_inlets()
+    ocean = output.get_ocean()
+    parameters = output.get_parameters()
 
     # initialize parameters and arrays
-    t = Pars.tstart
-    ndt = ceil((Pars.tend - Pars.tstart) / Pars.dt)
-    Inlets.wit = np.repeat(Inlets.wit, ndt, axis=0)
+    output.OpenInlets = copy.copy(inlets)
+    open_inlets = output.OpenInlets
+
+    t = parameters.tstart
+    ndt = ceil((parameters.tend - parameters.tstart) / parameters.dt)
+    inlets.wit = np.repeat(inlets.wit, ndt, axis=0)
     l2 = np.full(
-        (Pars.mtrunc + 1, Pars.ntrunc + 1, Basin.numinlets), Basin.length * Basin.width
+        (parameters.mtrunc + 1, parameters.ntrunc + 1, basin.get_number_of_inlets()), basin.get_length() * basin.get_width()
     )
     l2[1:, :, :] = l2[1:, :, :] / 2
     l2[:, 1:, :] = l2[:, 1:, :] / 2
     signs = np.array([1, -1])
     signs = np.tile(
         signs[:, np.newaxis, np.newaxis],
-        (ceil((Pars.mtrunc + 1) / 2), Pars.ntrunc + 1, Basin.numinlets),
+        (ceil((parameters.mtrunc + 1) / 2), parameters.ntrunc + 1, basin.get_number_of_inlets()),
     )
+    uj = inlets.uj
 
     # Main morphodynamic loop
     while (
-        t < Pars.tend
+        t < parameters.tend
         and max(abs(1 - uj[uj != 0])) > 1e-15
-        and np.sum(Inlets.widths) > 0
+        and np.sum(inlets.get_widths()) > 0
     ):
         # Determine open inlets
-        inlets_zip = np.squeeze(Inlets.widths > 0)
+        inlets_zip = np.squeeze(inlets.get_widths() > 0)
 
         # Integrate Eigenfunctions over inlets
         phij = np.zeros(l2.shape)
         phij[:, 0, inlets_zip] = 1
         phij[:, 1:, inlets_zip] = (
-            Basin.width
+            basin.get_width()
             / (
-                Pars.nrange[:, 1:, np.newaxis]
+                parameters.nrange[:, 1:, np.newaxis]
                 * np.pi
-                * Inlets.widths[np.newaxis, :, inlets_zip]
+                * inlets.get_widths()[np.newaxis, :, inlets_zip]
             )
             * (
                 np.sin(
-                    Pars.nrange[:, 1:, np.newaxis]
+                    parameters.nrange[:, 1:, np.newaxis]
                     * np.pi
-                    / Basin.width
+                    / basin.get_width()
                     * (
-                        Inlets.locations[np.newaxis, :, inlets_zip]
-                        + Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                        inlets.get_locations()[np.newaxis, :, inlets_zip]
+                        + inlets.get_widths()[np.newaxis, :, inlets_zip] / 2
                     )
                 )
                 - np.sin(
-                    Pars.nrange[:, 1:, np.newaxis]
+                    parameters.nrange[:, 1:, np.newaxis]
                     * np.pi
-                    / Basin.width
+                    / basin.get_width()
                     * (
-                        Inlets.locations[np.newaxis, :, inlets_zip]
-                        - Inlets.widths[np.newaxis, :, inlets_zip] / 2
+                        inlets.get_locations()[np.newaxis, :, inlets_zip]
+                        - inlets.get_widths()[np.newaxis, :, inlets_zip] / 2
                     )
                 )
             )
         )
         phij = (
             phij
-            * signs[0 : Pars.mtrunc + 1, 0 : Pars.ntrunc + 1, 0 : (Basin.numinlets)]
+            * signs[0 : parameters.mtrunc + 1, 0 : parameters.ntrunc + 1, 0 : (basin.get_number_of_inlets())]
         )
 
         # Create new handle for hydroloop
-        OpenInlets.widths = Inlets.widths[:, inlets_zip]
-        OpenInlets.depths = Inlets.depths[:, inlets_zip]
-        OpenInlets.lengths = Inlets.lengths[inlets_zip]
-        OpenInlets.locations = Inlets.locations[:, inlets_zip]
-        OpenInlets.uj = Inlets.uj[:, inlets_zip]
-        OpenInlets.cd = Inlets.cd
-        OpenInlets.numinlets = np.sum(inlets_zip)
+        open_inlets.widths = inlets.get_widths()[:, inlets_zip]
+        open_inlets.depths = inlets.depths[:, inlets_zip]
+        open_inlets.lengths = inlets.get_lengths()[inlets_zip]
+        open_inlets.locations = inlets.get_locations()[:, inlets_zip]
+        open_inlets.uj = inlets.uj[:, inlets_zip]
+        open_inlets.cd = inlets.cd
+        open_inlets.numinlets = np.sum(inlets_zip)
 
         # Run hydrodynamic model
         uj, ub, mui2, mub2 = hydrodynamic_model(
-            Output, l2[:, :, inlets_zip], phij[:, :, inlets_zip]
+            output, l2[:, :, inlets_zip], phij[:, :, inlets_zip]
         )
 
         # Update inlet mophology
-        Inlets.uj[:, inlets_zip] = uj
-        Basin.ub = ub
+        inlets.uj[:, inlets_zip] = uj
+        basin.ub = ub
 
         da = (
-            Inlets.sedimport
-            / Inlets.lengths
-            * ((Inlets.uj / Inlets.ueq) ** 3 - 1)
-            * Pars.dt
+            inlets.get_sediment_import()
+            / inlets.get_lengths()
+            * ((inlets.uj / inlets.get_equilibrium_velocity()) ** 3 - 1)
+            * parameters.dt
         )
-        newi = Inlets.widths ** 2 + da / Inlets.shape
+        newi = inlets.get_widths() ** 2 + da / inlets.get_shape_factor()
         nix = np.squeeze(newi > 0)
-        Inlets.widths[:, nix] = np.sqrt(newi[:, nix])
-        Inlets.widths[:, ~nix] = 0
+        inlets.get_widths()[:, nix] = np.sqrt(newi[:, nix])
+        inlets.get_widths()[:, ~nix] = 0
 
-        Inlets.depths = Inlets.shape * Inlets.widths
-        Inlets.uj[Inlets.widths == 0] = 0
+        inlets.depths = inlets.get_shape_factor() * inlets.get_widths()
+        inlets.uj[inlets.get_widths() == 0] = 0
 
         # Throw error if invalid inlet widhts are present
-        if np.isnan(Inlets.widths).any():
-            print(Inlets.wit)
-            print(Inlets.depths)
-            print(Inlets.uj, Basin.ub, mui2, mub2, da)
+        if np.isnan(inlets.get_widths()).any():
+            print(inlets.wit)
+            print(inlets.depths)
+            print(inlets.uj, basin.ub, mui2, mub2, da)
             raise NameError("aiaiai")
 
         # Finish timestep and prepare for next
         if silent is None:
-            print(t, Inlets.uj, da)
+            print(t, inlets.uj, da)
         else:
             print(t)
-        t = t + Pars.dt
-        tix = round((t - Pars.tstart) / Pars.dt)
-        Inlets.wit[tix - 1, :] = Inlets.widths
+        t = t + parameters.dt
+        tix = round((t - parameters.tstart) / parameters.dt)
+        inlets.wit[tix - 1, :] = inlets.get_widths()
 
-    Inlets.mui = mui2
-    Basin.mub = mub2
-    return Output
+    inlets.mui = mui2
+    basin.mub = mub2
+    return output

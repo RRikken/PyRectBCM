@@ -1,6 +1,7 @@
-from pyrectbcm.rectangular_input_generator import ModelData
 from pyrectbcm.rectangular_model import rec_model
 import time
+from pyrectbcm.rectangular_input_generator import Basin, Ocean, Inlets, Pars
+from pyrectbcm.model_data_factory import ModelDataFactory
 
 
 def main(location="testkees"):
@@ -9,18 +10,19 @@ def main(location="testkees"):
     start_time = time.time()
 
     # Prepare input data
-    Input = ModelData(location)
+    data_for_model = ModelDataFactory.build(data)
 
     # Run the model
-    Output = rec_model(Input, silent=True)
+    model_output = rec_model(data_for_model, silent=True)
 
     # Plot results
-    Output.evolution_plot_3p(orientation="h")
+    model_output.evolution_plot_3p(orientation="h")
 
     # Print elapsed time
     print("%s seconds" % (time.time() - start_time))
-    return Output
+
+    return model_output
 
 
 if __name__ == "__main__":
-    Output = main("testlocation")
+    main_model_output = main("testlocation")
